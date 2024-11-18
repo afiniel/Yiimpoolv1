@@ -15,7 +15,7 @@ echo -e "${YELLOW}Running pre-flight checks...${NC}\n"
 UBUNTU_DESCRIPTION=$(lsb_release -d | sed 's/.*:\s*//')
 UBUNTU_VERSION=$(lsb_release -rs)
 
-if [[ "${UBUNTU_DESCRIPTION}" == "Ubuntu 20.04 LTS" ]]; then
+if [[ "${UBUNTU_DESCRIPTION}" == "Ubuntu 20.04.6 LTS" ]]; then
   DISTRO=20
 elif [[ "${UBUNTU_DESCRIPTION}" == "Ubuntu 18.04 LTS" ]]; then
   DISTRO=18
