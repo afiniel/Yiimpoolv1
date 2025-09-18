@@ -23,10 +23,18 @@ This installer provides an automated way to set up a full Yiimp mining pool on U
 
 ## System Requirements
 
+### Standard Linux (Ubuntu/Debian)
 - Fresh Ubuntu/Debian installation
 - Minimum 8GB RAM (16GB recommended)
 - 2+ CPU cores
 - Clean domain or subdomain pointed to your VPS
+
+### Android/Termux
+- Android device with Termux app installed
+- Minimum 4GB RAM (8GB recommended)
+- ARM64 or x86_64 architecture
+- Stable internet connection
+- Termux:Boot addon (recommended for auto-start)
 
 ## Supported Operating Systems
 
@@ -43,12 +51,36 @@ This installer provides an automated way to set up a full Yiimp mining pool on U
 - Debian 11
 - Debian 12 (Build Stratum not working)
 
+### Android/Termux
+🆕 **NEW**: Android Support via Termux:
+- Termux on Android 7.0+
+- ARM64 and x86_64 architectures supported
+- Limited functionality compared to full Linux
+- Requires manual service management
+
 ## Installation
 
-### Quick Install
+### Quick Install (Linux)
 ```bash
 curl https://raw.githubusercontent.com/afiniel/Yiimpoolv1/master/install.sh | bash
 ```
+
+### Termux Android Install
+1. Install Termux from F-Droid (recommended) or Google Play Store
+2. Update Termux packages:
+   ```bash
+   pkg update && pkg upgrade
+   ```
+3. Install git and curl:
+   ```bash
+   pkg install git curl
+   ```
+4. Run the installer:
+   ```bash
+   curl https://raw.githubusercontent.com/afiniel/Yiimpoolv1/master/install.sh | bash
+   ```
+
+📱 **For detailed Termux installation instructions, see [TERMUX_INSTALL.md](TERMUX_INSTALL.md)**
 
 ### Configuration Steps
 The installer will guide you through:
@@ -60,9 +92,17 @@ The installer will guide you through:
 6. Stratum configuration
 
 ## Post-Installation Steps
+
+### Linux (Ubuntu/Debian)
 1. **Required**: Reboot your server after installation
 2. Wait 1-2 minutes after first login for services to initialize
 3. Run `motd` to view pool status
+
+### Android/Termux
+1. Start services manually: `~/yiimp-services.sh start`
+2. Check service status: `~/yiimp-services.sh status`
+3. Access web interface at `http://localhost:8080`
+4. Install Termux:Boot addon for automatic startup
 
 ## Directory Structure
 
@@ -81,18 +121,27 @@ The installer uses a secure directory structure:
 
 ## Management Commands
 
-### Screen Management
+### Linux Screen Management
 ```bash
 screen -list         # View all screens
 screen -r [name]     # Access screen (main|loop2|blocks|debug)
 ctrl+a+d             # Detach from current screen
 ```
 
-### Service Control
+### Linux Service Control
 ```bash
 screens start|stop|restart [service]   # Control specific services
 yiimp                                  # View pool overview
 motd                                   # Check system status
+```
+
+### Termux Service Management
+```bash
+~/yiimp-services.sh start     # Start all services
+~/yiimp-services.sh stop      # Stop all services
+~/yiimp-services.sh restart   # Restart all services
+~/yiimp-services.sh status    # Check service status
+yiimp-logs                    # View logs (alias)
 ```
 
 ## DaemonBuilder
@@ -107,6 +156,28 @@ Built-in coin daemon compiler accessible via the `daemonbuilder` command. Featur
 2. Use strong passwords for all services
 3. Do not modify default file permissions
 4. Regularly backup your data
+
+## Termux-Specific Considerations
+
+### Limitations
+- No systemd service management
+- Limited SSL/TLS certificate options
+- Uses high ports (8080+) to avoid permission issues
+- Some cryptocurrency daemons may not compile on ARM
+- No root access or traditional user management
+
+### Advantages
+- Runs on Android without root
+- Portable mining pool setup
+- Lower power consumption
+- Can run on tablets and phones
+- Good for testing and development
+
+### Performance Tips
+- Use a device with at least 4GB RAM
+- Ensure adequate cooling for extended operation
+- Use a stable power source
+- Monitor battery usage and temperature
 
 ## Support
 

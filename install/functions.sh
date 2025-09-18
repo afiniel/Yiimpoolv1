@@ -255,28 +255,44 @@ function package_compile_crypto {
 	# Installing Package to compile crypto currency
 	echo -e "$MAGENTA => Installing needed Package to compile crypto currency <= ${NC}"
 
-	hide_output sudo apt -y install software-properties-common build-essential
-	hide_output sudo apt -y install libtool autotools-dev automake pkg-config libssl-dev libevent-dev bsdmainutils git cmake libboost-all-dev zlib1g-dev libz-dev libseccomp-dev libcap-dev libminiupnpc-dev gettext
-	hide_output sudo apt -y install libminiupnpc10 libzmq5
-	hide_output sudo apt -y install libcanberra-gtk-module libqrencode-dev libzmq3-dev
-	hide_output sudo apt -y install libqt5gui5 libqt5core5a libqt5webkit5-dev libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler
-	hide_output sudo add-apt-repository -y ppa:bitcoin/bitcoin
-	hide_output sudo apt update
-	hide_output sudo apt -y install libdb4.8-dev libdb4.8++-dev libdb5.3 libdb5.3++
-	hide_output sudo apt -y install bison libbison-dev
-	hide_output sudo apt -y install libnatpmp-dev libnatpmp1 libqt5waylandclient5 libqt5waylandcompositor5 qtwayland5 systemtap-sdt-dev
-	
-	hide_output sudo apt-get -y install build-essential libzmq5 \
-	libtool autotools-dev automake pkg-config libssl-dev libevent-dev bsdmainutils git cmake libboost-all-dev zlib1g-dev libz-dev \
-	libseccomp-dev libcap-dev libminiupnpc-dev gettext libminiupnpc10 libcanberra-gtk-module libqrencode-dev libzmq3-dev \
-	libqt5gui5 libqt5core5a libqt5webkit5-dev libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler
-	hide_output sudo apt update
-	hide_output sudo apt -y upgrade
+	if [[ "$DISTRO" == "termux" ]]; then
+		# Termux-specific package installation
+		echo -e "$YELLOW => Installing Termux packages for crypto compilation <= ${NC}"
+		hide_output pkg install -y clang make cmake git
+		hide_output pkg install -y libtool autoconf automake pkg-config
+		hide_output pkg install -y openssl-dev libevent-dev
+		hide_output pkg install -y boost-dev zlib-dev
+		hide_output pkg install -y libzmq-dev
+		hide_output pkg install -y protobuf-dev
+		hide_output pkg install -y python
+		hide_output pkg install -y libgmp-dev libsodium-dev
+		hide_output pkg install -y libcurl-dev
+		echo -e "$GREEN => Termux crypto compilation packages installed <= ${NC}"
+	else
+		# Standard Ubuntu/Debian package installation
+		hide_output sudo apt -y install software-properties-common build-essential
+		hide_output sudo apt -y install libtool autotools-dev automake pkg-config libssl-dev libevent-dev bsdmainutils git cmake libboost-all-dev zlib1g-dev libz-dev libseccomp-dev libcap-dev libminiupnpc-dev gettext
+		hide_output sudo apt -y install libminiupnpc10 libzmq5
+		hide_output sudo apt -y install libcanberra-gtk-module libqrencode-dev libzmq3-dev
+		hide_output sudo apt -y install libqt5gui5 libqt5core5a libqt5webkit5-dev libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler
+		hide_output sudo add-apt-repository -y ppa:bitcoin/bitcoin
+		hide_output sudo apt update
+		hide_output sudo apt -y install libdb4.8-dev libdb4.8++-dev libdb5.3 libdb5.3++
+		hide_output sudo apt -y install bison libbison-dev
+		hide_output sudo apt -y install libnatpmp-dev libnatpmp1 libqt5waylandclient5 libqt5waylandcompositor5 qtwayland5 systemtap-sdt-dev
+		
+		hide_output sudo apt-get -y install build-essential libzmq5 \
+		libtool autotools-dev automake pkg-config libssl-dev libevent-dev bsdmainutils git cmake libboost-all-dev zlib1g-dev libz-dev \
+		libseccomp-dev libcap-dev libminiupnpc-dev gettext libminiupnpc10 libcanberra-gtk-module libqrencode-dev libzmq3-dev \
+		libqt5gui5 libqt5core5a libqt5webkit5-dev libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler
+		hide_output sudo apt update
+		hide_output sudo apt -y upgrade
 
-	hide_output sudo apt -y install libgmp-dev libunbound-dev libsodium-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev \
-	libpgm-dev libhidapi-dev libusb-1.0-0-dev libudev-dev libboost-chrono-dev libboost-date-time-dev libboost-filesystem-dev \
-	libboost-locale-dev libboost-program-options-dev libboost-regex-dev libboost-serialization-dev libboost-system-dev libboost-thread-dev \
-	python3 ccache doxygen graphviz default-libmysqlclient-dev libnghttp2-dev librtmp-dev libssh2-1 libssh2-1-dev libldap2-dev libidn11-dev libpsl-dev
+		hide_output sudo apt -y install libgmp-dev libunbound-dev libsodium-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev \
+		libpgm-dev libhidapi-dev libusb-1.0-0-dev libudev-dev libboost-chrono-dev libboost-date-time-dev libboost-filesystem-dev \
+		libboost-locale-dev libboost-program-options-dev libboost-regex-dev libboost-serialization-dev libboost-system-dev libboost-thread-dev \
+		python3 ccache doxygen graphviz default-libmysqlclient-dev libnghttp2-dev librtmp-dev libssh2-1 libssh2-1-dev libldap2-dev libidn11-dev libpsl-dev
+	fi
 }
 
 # Function to check if a package is installed and install it if not
@@ -299,38 +315,70 @@ function check_package_installed() {
 }
 
 function apt_get_quiet {
-	DEBIAN_FRONTEND=noninteractive hide_output sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew" "$@"
+	if [[ "$DISTRO" == "termux" ]]; then
+		hide_output pkg install -y "$@"
+	else
+		DEBIAN_FRONTEND=noninteractive hide_output sudo apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew" "$@"
+	fi
 }
 
 function apt_install {
 	PACKAGES=$@
-	apt_get_quiet install $PACKAGES
+	if [[ "$DISTRO" == "termux" ]]; then
+		hide_output pkg install -y $PACKAGES
+	else
+		apt_get_quiet install $PACKAGES
+	fi
 }
 
 function apt_update {
-	sudo apt-get update
+	if [[ "$DISTRO" == "termux" ]]; then
+		pkg update -y
+	else
+		sudo apt-get update
+	fi
 }
 
 function apt_upgrade {
-	hide_output sudo apt-get upgrade -y
+	if [[ "$DISTRO" == "termux" ]]; then
+		hide_output pkg upgrade -y
+	else
+		hide_output sudo apt-get upgrade -y
+	fi
 }
 
 function apt_dist_upgrade {
-	hide_output sudo apt-get dist-upgrade -y
+	if [[ "$DISTRO" == "termux" ]]; then
+		hide_output pkg upgrade -y
+	else
+		hide_output sudo apt-get dist-upgrade -y
+	fi
 }
 
 function apt_autoremove {
-	hide_output sudo apt-get autoremove -y
+	if [[ "$DISTRO" == "termux" ]]; then
+		hide_output pkg autoclean
+	else
+		hide_output sudo apt-get autoremove -y
+	fi
 }
 
 function ufw_allow {
-	if [ -z "$DISABLE_FIREWALL" ]; then
+	if [[ "$DISTRO" == "termux" ]]; then
+		# Termux doesn't have ufw, skip firewall configuration
+		echo -e "${YELLOW}Termux: Skipping firewall configuration for port $1${NC}"
+	elif [ -z "$DISABLE_FIREWALL" ]; then
 		sudo ufw allow $1 >/dev/null
 	fi
 }
 
 function restart_service {
-	hide_output sudo service $1 restart
+	if [[ "$DISTRO" == "termux" ]]; then
+		# Termux doesn't have systemd, services are managed differently
+		echo -e "${YELLOW}Termux: Service restart for $1 - manual management required${NC}"
+	else
+		hide_output sudo service $1 restart
+	fi
 }
 
 ## Dialog Functions ##

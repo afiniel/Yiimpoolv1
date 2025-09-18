@@ -41,16 +41,31 @@ if [[ "$FIRST_TIME_SETUP" == "1" ]]; then
     echo -e "${YELLOW}Performing first-time setup...${NC}\n"
     # Copy functions to /etc
     source functions.sh
-    sudo cp -r functions.sh /etc/
-    sudo cp -r editconf.py /usr/bin
-    sudo chmod +x /usr/bin/editconf.py
-    echo -e "${GREEN}Copied functions and editconf.py to system directories.${NC}\n"
+    
+    if [[ "$DISTRO" == "termux" ]]; then
+        # Termux doesn't have /etc, use PREFIX
+        cp -r functions.sh "$PREFIX/etc/"
+        cp -r editconf.py "$PREFIX/bin/"
+        chmod +x "$PREFIX/bin/editconf.py"
+        echo -e "${GREEN}Copied functions and editconf.py to Termux directories.${NC}\n"
+    else
+        sudo cp -r functions.sh /etc/
+        sudo cp -r editconf.py /usr/bin
+        sudo chmod +x /usr/bin/editconf.py
+        echo -e "${GREEN}Copied functions and editconf.py to system directories.${NC}\n"
+    fi
 
     # Check system setup: Are we running as root on Ubuntu 16.04/18.04/20.04 on a
     # machine with enough memory?
     # If not, this shows an error and exits.
     echo -e "${YELLOW}Running preflight system checks...${NC}\n"
     source preflight.sh
+    
+    # Handle Termux-specific setup
+    if [[ "$DISTRO" == "termux" ]]; then
+        echo -e "${YELLOW}Termux environment detected - running Termux-specific setup...${NC}\n"
+        source termux_setup.sh
+    fi
 
     # Ensure Python reads/writes files in UTF-8.
     if ! locale -a | grep en_US.utf8 >/dev/null; then
@@ -70,14 +85,31 @@ if [[ "$FIRST_TIME_SETUP" == "1" ]]; then
 
     # Check for user
     echo -e "${YELLOW}Installing necessary packages for setup to continue...${NC}\n"
-    hide_output sudo apt-get -q -q update
-    hide_output sudo apt-get install -y figlet
-    hide_output sudo apt-get install -y lolcat
-    apt_get_quiet install dialog python3 python3-pip acl nano git apt-transport-https || exit 1
+    if [[ "$DISTRO" == "termux" ]]; then
+        pkg update -y
+        pkg install -y figlet
+        pkg install -y ruby
+        gem install lolcat
+        apt_install dialog python python-pip nano git || exit 1
+    else
+        hide_output sudo apt-get -q -q update
+        hide_output sudo apt-get install -y figlet
+        hide_output sudo apt-get install -y lolcat
+        apt_get_quiet install dialog python3 python3-pip acl nano git apt-transport-https || exit 1
+    fi
     echo -e "${GREEN}Installed necessary packages.${NC}\n"
 
     # Are we running as root?
-    if [[ $EUID -ne 0 ]]; then
+    if [[ "$DISTRO" == "termux" ]]; then
+        echo -e "${YELLOW}Termux environment detected - skipping root check...${NC}\n"
+        # Welcome message for Termux
+        message_box "Yiimpool Installer $VERSION - Termux" \
+        "${YELLOW}Hello and thanks for using the Yiimpool Installer on Android/Termux!${NC}
+        \n\n${GREEN}Installation for the most part is fully automated. In most cases any user responses that are needed are asked prior to the installation.${NC}
+        \n\n${BLUE}NOTE: This is a Termux-specific installation with some limitations compared to full Linux.${NC}"
+        source existing_user.sh
+        exit
+    elif [[ $EUID -ne 0 ]]; then
         echo -e "${YELLOW}Running as a non-root user. Displaying welcome message...${NC}\n"
         # Welcome
         message_box "Yiimpool Installer $VERSION" \

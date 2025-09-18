@@ -26,19 +26,29 @@ print_info "Starting system configuration..."
 
 # Set timezone to UTC
 print_header "Setting TimeZone"
-if [ ! -f /etc/timezone ]; then
+if [[ "$DISTRO" == "termux" ]]; then
+    print_status "Termux detected - timezone configuration handled differently"
+    export TZ=UTC
+    print_success "Timezone set to UTC for Termux"
+elif [ ! -f /etc/timezone ]; then
     print_status "Setting timezone to UTC"
     sudo timedatectl set-timezone UTC
     restart_service rsyslog
+    print_success "Timezone set to UTC"
+else
+    print_success "Timezone already configured"
 fi
-print_success "Timezone set to UTC"
 
 apt_install software-properties-common build-essential
 
 # CertBot
 print_header "Installing CertBot"
 
-if [[ "$DISTRO" == "16" || "$DISTRO" == "18" ]]; then
+if [[ "$DISTRO" == "termux" ]]; then
+    print_status "Termux detected - SSL certificates need to be managed manually"
+    print_warning "CertBot is not available in Termux. Consider using alternative SSL solutions."
+    print_success "CertBot installation skipped for Termux"
+elif [[ "$DISTRO" == "16" || "$DISTRO" == "18" ]]; then
     print_status "Installing CertBot PPA for Ubuntu 16/18"
     hide_output sudo add-apt-repository -y ppa:certbot/certbot
     hide_output sudo apt-get update
@@ -59,47 +69,53 @@ fi
 
 print_header "Installing MariaDB"
 
-# Create directory for keys if it doesn't exist
-if [ ! -d /etc/apt/keyrings ]; then
-    sudo mkdir -p /etc/apt/keyrings
-fi
+if [[ "$DISTRO" == "termux" ]]; then
+    print_status "Installing MariaDB for Termux"
+    apt_install mariadb
+    print_success "MariaDB installation complete for Termux"
+else
+    # Create directory for keys if it doesn't exist
+    if [ ! -d /etc/apt/keyrings ]; then
+        sudo mkdir -p /etc/apt/keyrings
+    fi
 
-# Download and add the MariaDB signing key
-if [ ! -f /etc/apt/keyrings/mariadb.gpg ]; then
-    print_status "Downloading MariaDB signing key"
-    sudo curl -fsSL https://mariadb.org/mariadb_release_signing_key.pgp | sudo gpg --dearmor -o /etc/apt/keyrings/mariadb.gpg
-fi
+    # Download and add the MariaDB signing key
+    if [ ! -f /etc/apt/keyrings/mariadb.gpg ]; then
+        print_status "Downloading MariaDB signing key"
+        sudo curl -fsSL https://mariadb.org/mariadb_release_signing_key.pgp | sudo gpg --dearmor -o /etc/apt/keyrings/mariadb.gpg
+    fi
 
-case "$DISTRO" in
-    "16")  # Ubuntu 16.04
-        echo "deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,i386,ppc64el] https://mirror.mariadb.org/repo/10.4/ubuntu xenial main" \ 
-        ;;
-    "18")  # Ubuntu 18.04
-        echo "deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el] https://mirror.mariadb.org/repo/10.6/ubuntu bionic main" \ 
-        ;;
-    "20")  # Ubuntu 20.04
-        echo "deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/10.6/ubuntu focal main" \
-        ;;
-    "22")  # Ubuntu 22.04
-        echo "deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/10.6/ubuntu jammy main" \
-        ;;
-    "23")  # Ubuntu 23.04
-        echo "deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.6/ubuntu lunar main" \
-        ;;
-    "24")  # Ubuntu 24.04
-        echo "deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.6/ubuntu noble main" \
-        ;;
-    "12")  # Debian 12
-        echo "deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.6/debian bookworm main" \
-        ;;
-    "11")  # Debian 11
-        echo "deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/10.6/debian bullseye main" \
-        ;;
-    *)
-        print_error "Unsupported Ubuntu/Debian version: $DISTRO"
-        exit 1
-        ;;
-esac
+    case "$DISTRO" in
+        "16")  # Ubuntu 16.04
+            echo "deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,i386,ppc64el] https://mirror.mariadb.org/repo/10.4/ubuntu xenial main" \ 
+            ;;
+        "18")  # Ubuntu 18.04
+            echo "deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el] https://mirror.mariadb.org/repo/10.6/ubuntu bionic main" \ 
+            ;;
+        "20")  # Ubuntu 20.04
+            echo "deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/10.6/ubuntu focal main" \
+            ;;
+        "22")  # Ubuntu 22.04
+            echo "deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/10.6/ubuntu jammy main" \
+            ;;
+        "23")  # Ubuntu 23.04
+            echo "deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.6/ubuntu lunar main" \
+            ;;
+        "24")  # Ubuntu 24.04
+            echo "deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.6/ubuntu noble main" \
+            ;;
+        "12")  # Debian 12
+            echo "deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.6/debian bookworm main" \
+            ;;
+        "11")  # Debian 11
+            echo "deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/10.6/debian bullseye main" \
+            ;;
+        *)
+            print_error "Unsupported Ubuntu/Debian version: $DISTRO"
+            exit 1
+            ;;
+    esac
+fi
 print_success "MariaDB repository setup complete"
 hide_output sudo apt-get update
 
