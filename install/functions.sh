@@ -362,13 +362,17 @@ function input_box {
 	export TERM=${TERM:-xterm}
 
 	# Run dialog and capture its exit status directly (no fallback in the same command)
-	result=$(dialog --stdout --title "$1" --inputbox "$2" 0 0 "$3" 2>/dev/null)
+	# Use /dev/tty for stderr to ensure proper terminal access
+	result=$(dialog --stdout --title "$1" --inputbox "$2" 0 0 "$3" 2>/dev/tty)
 	result_code=$?
 
 	# If dialog failed/canceled or returned an empty string, fall back to default
 	if [ $result_code -ne 0 ] || [ -z "${result}" ]; then
 		result="$3"
 	fi
+	
+	# Always return 0 to prevent script exit on dialog cancellation when set -e is enabled
+	return 0
 }
 
 function input_menu {

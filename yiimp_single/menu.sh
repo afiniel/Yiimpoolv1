@@ -11,11 +11,37 @@
 source /etc/yiimpooldonate.conf
 source /etc/functions.sh
 
-RESULT=$(dialog --stdout --default-item 1 --title "Yiimpool YiiMP Installer $VERSION" --menu "Choose an option" -1 55 7 \
+# Ensure TERM is set for dialog commands
+export TERM=${TERM:-xterm}
+export NCURSES_NO_UTF8_ACS=1
+
+RESULT=$(dialog --stdout --default-item 1 --title "Yiimpool YiiMP Installer $VERSION" --menu "Choose an option" -1 55 3 \
     ' ' "- Do you want to install YiiMP with WireGuard? -" \
     1 "Yes" \
     2 "No" \
-    3 exit)
+    3 "Exit" 2>/dev/tty)
+DIALOG_EXIT=$?
+
+# Handle dialog exit codes
+if [ $DIALOG_EXIT -ne 0 ]; then
+    if [ $DIALOG_EXIT -eq 1 ]; then
+        # User canceled
+        clear
+        exit 0
+    elif [ $DIALOG_EXIT -eq 255 ]; then
+        echo "Error: Dialog cannot access the terminal."
+        exit 1
+    else
+        echo "Dialog exited with code: $DIALOG_EXIT"
+        exit 1
+    fi
+fi
+
+# Check if result is empty
+if [ -z "$RESULT" ]; then
+    clear
+    exit 0
+fi
 
 case "$RESULT" in
     1)
@@ -30,6 +56,11 @@ case "$RESULT" in
         ;;
     3)
         clear;
-        exit;
+        exit 0;
+        ;;
+    *)
+        clear;
+        echo "Invalid selection."
+        exit 1;
         ;;
 esac

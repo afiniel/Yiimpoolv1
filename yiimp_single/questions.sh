@@ -15,6 +15,7 @@ set -e
 
 # Ensure TERM is set for dialog commands
 export TERM=${TERM:-xterm}
+export NCURSES_NO_UTF8_ACS=1
 
 # Source wireguard configuration if enabled
 if [[ ("$wireguard" == "true") ]]; then
@@ -51,13 +52,17 @@ set +e
 dialog --title "Using Domain Name" \
 --yesno "Are you using a domain name? Example: example.com
 
-Make sure the DNS is updated and pointing to this server's IP address!" 8 60 2>/dev/null
+Make sure the DNS is updated and pointing to this server's IP address!" 8 60 2>/dev/tty
 response=$?
 set -e
 case $response in
    0) UsingDomain=yes;;
    1) UsingDomain=no;;
-   255) echo "[ESC] key pressed."; exit;;
+   255) 
+       echo "Error: Dialog cannot access the terminal."
+       echo "Please ensure you are running this script in an interactive terminal."
+       exit 1
+       ;;
 esac
 
 # If using a domain, further prompts for subdomain and domain name
@@ -66,18 +71,23 @@ if [[ "$UsingDomain" == "yes" ]]; then
     dialog --title "Using Sub-Domain" \
     --yesno "Are you using a sub-domain for the main website domain? Example: pool.example.com
 
-Make sure the DNS is updated and pointing to this server's IP address!" 8 60 2>/dev/null
+Make sure the DNS is updated and pointing to this server's IP address!" 8 60 2>/dev/tty
     response=$?
     set -e
     case $response in
        0) UsingSubDomain=yes;;
        1) UsingSubDomain=no;;
-       255) echo "[ESC] key pressed."; exit;;
+       255) 
+           echo "Error: Dialog cannot access the terminal."
+           echo "Please ensure you are running this script in an interactive terminal."
+           exit 1
+           ;;
     esac
 
     # Input box for domain name
     if [ -z "${DomainName:-}" ]; then
         DEFAULT_DomainName=example.com
+        set +e
         input_box "Domain Name" \
         "Enter your domain name. If using a subdomain, enter the full domain as in pool.example.com.
 
@@ -88,6 +98,7 @@ Make sure the domain DNS is pointed to this server's IP address before continuin
 Domain Name:" \
         "${DEFAULT_DomainName}" \
         DomainName
+        set -e
 
         if [ -z "${DomainName}" ]; then
             exit
@@ -97,6 +108,7 @@ Domain Name:" \
     # Input box for Stratum URL
     if [ -z "${StratumURL:-}" ]; then
         DEFAULT_StratumURL=${DomainName}
+        set +e
         input_box "Stratum URL" \
         "Enter your stratum URL. It is recommended to use another subdomain such as stratum.${DomainName}.
 
@@ -105,6 +117,7 @@ Do not add www. to the domain name.
 Stratum URL:" \
         "${DEFAULT_StratumURL}" \
         StratumURL
+        set -e
 
         if [ -z "${StratumURL}" ]; then
             exit
@@ -116,13 +129,17 @@ Stratum URL:" \
     dialog --title "Install SSL" \
     --yesno "Would you like the system to install SSL automatically?
 
-This will configure HTTPS for secure connections." 8 60 2>/dev/null
+This will configure HTTPS for secure connections." 8 60 2>/dev/tty
     response=$?
     set -e
     case $response in
        0) InstallSSL=yes;;
        1) InstallSSL=no;;
-       255) echo "[ESC] key pressed."; exit;;
+       255) 
+           echo "Error: Dialog cannot access the terminal."
+           echo "Please ensure you are running this script in an interactive terminal."
+           exit 1
+           ;;
     esac
 else
     # Set DomainName and StratumURL to server IP if not using a domain
@@ -134,6 +151,7 @@ else
     # If IP detection failed or returned empty, prompt user for IP address
     if [ -z "${DomainName:-}" ]; then
         DEFAULT_DomainName=$(get_default_privateip 4 2>/dev/null || echo "127.0.0.1")
+        set +e
         input_box "Server IP Address" \
         "Unable to automatically detect your server's IP address.
 
@@ -142,6 +160,7 @@ Please enter your server's public IP address:
 Server IP Address:" \
         "${DEFAULT_DomainName}" \
         DomainName
+        set -e
         
         if [ -z "${DomainName}" ]; then
             # If user didn't provide IP, use the default
@@ -156,13 +175,17 @@ Server IP Address:" \
     dialog --title "Install SSL" \
     --yesno "Would you like the system to install SSL automatically?
 
-Note: Self-signed SSL certificate will be used when installing with an IP address (browsers will show a security warning)." 9 60 2>/dev/null
+Note: Self-signed SSL certificate will be used when installing with an IP address (browsers will show a security warning)." 9 60 2>/dev/tty
     response=$?
     set -e
     case $response in
        0) InstallSSL=yes;;
        1) InstallSSL=no;;
-       255) echo "[ESC] key pressed."; exit;;
+       255) 
+           echo "Error: Dialog cannot access the terminal."
+           echo "Please ensure you are running this script in an interactive terminal."
+           exit 1
+           ;;
     esac
 fi
 
@@ -376,7 +399,7 @@ Stratum URL           : ${StratumURL}
 Install SSL           : ${InstallSSL}
 System Email          : ${SupportEmail}
 Your Public IP        : ${PublicIP}
-phpMyAdmin Username   : ${PHPMyAdminUser}" 17 60 2>/dev/null
+phpMyAdmin Username   : ${PHPMyAdminUser}" 17 60 2>/dev/tty
 
 # Get exit status of confirmation dialog
 # 0 means user confirmed, 1 means user canceled
@@ -443,8 +466,9 @@ case $response in
         ;;
     255)
         clear
-        echo "User canceled installation"
-        exit 0
+        echo "Error: Dialog cannot access the terminal."
+        echo "Please ensure you are running this script in an interactive terminal."
+        exit 1
         ;;
 esac
 
