@@ -11,6 +11,9 @@ source /etc/yiimpoolversion.conf
 source /etc/functions.sh
 source /etc/yiimpool.conf
 
+# Ensure TERM is set for dialog commands
+export TERM=${TERM:-xterm}
+
 # Load yiimp instance config if readable; otherwise continue (questions.sh will create it)
 if [ -r "$STORAGE_ROOT/yiimp/.yiimp.conf" ]; then
     source $STORAGE_ROOT/yiimp/.yiimp.conf

@@ -9,6 +9,10 @@
 
 source /etc/yiimpoolversion.conf
 source /etc/functions.sh
+
+# Ensure TERM is set for dialog commands
+export TERM=${TERM:-xterm}
+
 cd ~/Yiimpoolv1/install
 clear
 
@@ -18,21 +22,22 @@ message_box "Yiimpool Installer $VERSION" \
 \n\nInstallation for the most part is fully automated. In most cases any user responses that are needed are asked prior to the installation.
 \n\nNOTE: You should only install this on a brand new Ubuntu 20.04 , Ubuntu 18.04 or Ubuntu 16.04 installation."
 
-# Root warning message box
 message_box "Yiimpool Installer $VERSION" \
 "WARNING: You are about to run this script as root!
 \n\n The program will create a new user account with sudo privileges. 
 \n\nThe next step, you will be asked to create a new user account, you can name it whatever you want."
 
 # Ask if SSH key or password user
+set +e
 dialog --title "Create New User With SSH Key" \
 --yesno "Do you want to create new user with SSH key login?
-Selecting no will create user with password login only." 7 60
+Selecting no will create user with password login only." 7 60 2>/dev/null
 response=$?
+set -e
 case $response in
 0) UsingSSH=yes ;;
 1) UsingSSH=no ;;
-255) echo "[ESC] key pressed." ;;
+255) echo "[ESC] key pressed."; exit ;;
 esac
 
 # If Using SSH Key Login
@@ -47,7 +52,7 @@ if [[ ("$UsingSSH" == "yes") ]]; then
             yiimpadmin
 
         if [ -z "${yiimpadmin}" ]; then
-            # user hit ESC/cancel
+           
             exit
         fi
     fi
@@ -100,6 +105,66 @@ if [[ ("$UsingSSH" == "yes") ]]; then
     # Check required files and set global variables
     cd $HOME/Yiimpoolv1/install
     source pre_setup.sh
+
+    # Set STORAGE_USER and STORAGE_ROOT to default values if not already set
+    if [ -z "${STORAGE_USER:-}" ]; then
+        STORAGE_USER=${DEFAULT_STORAGE_USER:-"crypto-data"}
+    fi
+    if [ -z "${STORAGE_ROOT:-}" ]; then
+        STORAGE_ROOT=${DEFAULT_STORAGE_ROOT:-"/home/$STORAGE_USER"}
+    fi
+
+    # Detect OS and set DISTRO if not already set
+    if [ -z "${DISTRO:-}" ]; then
+        if [[ -f /etc/rpi-issue ]]; then
+            # Raspberry Pi OS detection
+            RASBERRY_PI_DESCRIPTION=$(lsb_release -rs 2>/dev/null || cat /etc/debian_version | cut -d. -f1)
+            if [[ "${RASBERRY_PI_DESCRIPTION}" == "13" ]] || [[ "${RASBERRY_PI_DESCRIPTION}" == "12" ]] || [[ "${RASBERRY_PI_DESCRIPTION}" == "11" ]]; then
+                DISTRO=13
+            else
+                DISTRO=13  # Default to 13 for Raspberry Pi if unknown version
+            fi
+        elif [[ -f /etc/lsb-release ]]; then
+            # Ubuntu detection
+            UBUNTU_DESCRIPTION=$(lsb_release -rs)
+            if [[ "${UBUNTU_DESCRIPTION}" == "24.04" ]]; then
+                DISTRO=24
+            elif [[ "${UBUNTU_DESCRIPTION}" == "23.04" ]]; then
+                DISTRO=23
+            elif [[ "${UBUNTU_DESCRIPTION}" == "22.04" ]]; then
+                DISTRO=22
+            elif [[ "${UBUNTU_DESCRIPTION}" == "20.04" ]]; then
+                DISTRO=20
+            elif [[ "${UBUNTU_DESCRIPTION}" == "18.04" ]]; then
+                DISTRO=18
+            elif [[ "${UBUNTU_DESCRIPTION}" == "16.04" ]]; then
+                DISTRO=16
+            else
+                DISTRO=22  # Default to Ubuntu 22.04 if unknown version
+            fi
+        else
+            # Debian detection
+            DEBIAN_DESCRIPTION=$(cat /etc/debian_version 2>/dev/null | cut -d. -f1)
+            if [[ "${DEBIAN_DESCRIPTION}" == "12" ]]; then
+                DISTRO=12
+            elif [[ "${DEBIAN_DESCRIPTION}" == "11" ]]; then
+                DISTRO=11
+            else
+                DISTRO=12  # Default to Debian 12 if unknown version
+            fi
+        fi
+    fi
+
+    # Set default values for other variables that might be unbound
+    if [ -z "${PUBLIC_IP:-}" ]; then
+        PUBLIC_IP=""
+    fi
+    if [ -z "${PUBLIC_IPV6:-}" ]; then
+        PUBLIC_IPV6=""
+    fi
+    if [ -z "${PRIVATE_IP:-}" ]; then
+        PRIVATE_IP=""
+    fi
 
     # Create the STORAGE_USER and STORAGE_ROOT directory if they don't already exist.
     if ! id -u $STORAGE_USER >/dev/null 2>&1; then
@@ -180,16 +245,18 @@ fi
 
 clear
 
+set +e
 dialog --title "Verify Your input" \
     --yesno "Please verify your answers before you continue:
 New User Name : ${yiimpadmin}
-New User Pass : ${RootPassword}" 8 60
+New User Pass : ${RootPassword}" 8 60 2>/dev/null
 
 # Get exit status
 # 0 means user hit [yes] button.
 # 1 means user hit [no] button.
 # 255 means user hit [Esc] key.
 response=$?
+set -e
 case $response in
 
 0)
@@ -215,6 +282,66 @@ case $response in
     # Check required files and set global variables
     cd $HOME/Yiimpoolv1/install
     source pre_setup.sh
+
+    # Set STORAGE_USER and STORAGE_ROOT to default values if not already set
+    if [ -z "${STORAGE_USER:-}" ]; then
+        STORAGE_USER=${DEFAULT_STORAGE_USER:-"crypto-data"}
+    fi
+    if [ -z "${STORAGE_ROOT:-}" ]; then
+        STORAGE_ROOT=${DEFAULT_STORAGE_ROOT:-"/home/$STORAGE_USER"}
+    fi
+
+    # Detect OS and set DISTRO if not already set
+    if [ -z "${DISTRO:-}" ]; then
+        if [[ -f /etc/rpi-issue ]]; then
+            # Raspberry Pi OS detection
+            RASBERRY_PI_DESCRIPTION=$(lsb_release -rs 2>/dev/null || cat /etc/debian_version | cut -d. -f1)
+            if [[ "${RASBERRY_PI_DESCRIPTION}" == "13" ]] || [[ "${RASBERRY_PI_DESCRIPTION}" == "12" ]] || [[ "${RASBERRY_PI_DESCRIPTION}" == "11" ]]; then
+                DISTRO=13
+            else
+                DISTRO=13  # Default to 13 for Raspberry Pi if unknown version
+            fi
+        elif [[ -f /etc/lsb-release ]]; then
+            # Ubuntu detection
+            UBUNTU_DESCRIPTION=$(lsb_release -rs)
+            if [[ "${UBUNTU_DESCRIPTION}" == "24.04" ]]; then
+                DISTRO=24
+            elif [[ "${UBUNTU_DESCRIPTION}" == "23.04" ]]; then
+                DISTRO=23
+            elif [[ "${UBUNTU_DESCRIPTION}" == "22.04" ]]; then
+                DISTRO=22
+            elif [[ "${UBUNTU_DESCRIPTION}" == "20.04" ]]; then
+                DISTRO=20
+            elif [[ "${UBUNTU_DESCRIPTION}" == "18.04" ]]; then
+                DISTRO=18
+            elif [[ "${UBUNTU_DESCRIPTION}" == "16.04" ]]; then
+                DISTRO=16
+            else
+                DISTRO=22  # Default to Ubuntu 22.04 if unknown version
+            fi
+        else
+            # Debian detection
+            DEBIAN_DESCRIPTION=$(cat /etc/debian_version 2>/dev/null | cut -d. -f1)
+            if [[ "${DEBIAN_DESCRIPTION}" == "12" ]]; then
+                DISTRO=12
+            elif [[ "${DEBIAN_DESCRIPTION}" == "11" ]]; then
+                DISTRO=11
+            else
+                DISTRO=12  # Default to Debian 12 if unknown version
+            fi
+        fi
+    fi
+
+    # Set default values for other variables that might be unbound
+    if [ -z "${PUBLIC_IP:-}" ]; then
+        PUBLIC_IP=""
+    fi
+    if [ -z "${PUBLIC_IPV6:-}" ]; then
+        PUBLIC_IPV6=""
+    fi
+    if [ -z "${PRIVATE_IP:-}" ]; then
+        PRIVATE_IP=""
+    fi
 
     # Create the STORAGE_USER and STORAGE_ROOT directory if they don't already exist.
     if ! id -u $STORAGE_USER >/dev/null 2>&1; then

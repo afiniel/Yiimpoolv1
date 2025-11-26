@@ -137,9 +137,9 @@ fi
 echo -e "$GREEN Done...$COL_RESET"
 
 ARCHITECTURE=$(uname -m)
-  if [ "$ARCHITECTURE" != "x86_64" ]; then
+  if [ "$ARCHITECTURE" != "x86_64" ] && [ "$ARCHITECTURE" != "aarch64" ]; then
     if [ -z "$ARM" ]; then
-      echo "Yiimpool Setup Installer only supports x86_64 and will not work on any other architecture, like ARM or 32 bit OS."
+      echo "Yiimpool Setup Installer only supports x86_64 and aarch64 architectures and will not work on any other architecture, like 32 bit OS or other ARM variants."
       echo "Your architecture is $ARCHITECTURE"
       exit
     fi
@@ -152,7 +152,7 @@ echo -e "$YELLOW => Setting our global variables <= ${NC}"
 # and possibly confirm with user.
 if [ -z "${PUBLIC_IP:-}" ]; then
 # Ask the Internet.
-GUESSED_IP=$(get_publicip_from_web_service 4)
+GUESSED_IP=$(get_publicip_from_web_service 4 || true)
 
 # On the first run, if we got an answer from the Internet then don't
 # ask the user.
@@ -183,7 +183,7 @@ fi
 # doesn't have an IPv6, don't ask for one.
 if [ -z "${PUBLIC_IPV6:-}" ]; then
 	# Ask the Internet.
-	GUESSED_IP=$(get_publicip_from_web_service 6)
+	GUESSED_IP=$(get_publicip_from_web_service 6 || true)
 	MATCHED=0
 	if [[ -z "${DEFAULT_PUBLIC_IPV6:-}" && ! -z "$GUESSED_IP" ]]; then
 		PUBLIC_IPV6=$GUESSED_IP
@@ -193,7 +193,7 @@ if [ -z "${PUBLIC_IPV6:-}" ]; then
 		PUBLIC_IPV6=$GUESSED_IP
 		MATCHED=1
 	elif [[ -z "${DEFAULT_PUBLIC_IPV6:-}" ]]; then
-		DEFAULT_PUBLIC_IP=$(get_default_privateip 6)
+		DEFAULT_PUBLIC_IPV6=$(get_default_privateip 6 || true)
 	fi
 
 	if [[ -z "${PUBLIC_IPV6:-}" && $MATCHED == 0 ]]; then

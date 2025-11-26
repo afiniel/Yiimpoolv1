@@ -335,7 +335,12 @@ function restart_service {
 
 ## Dialog Functions ##
 function message_box {
-	dialog --title "$1" --msgbox "$2" 0 0
+	# Check if TTY is available before using dialog
+	if [ ! -t 0 ] || [ ! -t 1 ] || [ -z "${TERM:-}" ]; then
+		echo "$2"
+		return 0
+	fi
+	dialog --title "$1" --msgbox "$2" 0 0 2>/dev/null || echo "$2"
 }
 
 function input_box {
@@ -344,8 +349,23 @@ function input_box {
 	# The exit code from dialog will be stored in VARIABLE_EXITCODE.
 	declare -n result=$4
 	declare -n result_code=$4_EXITCODE
-	result=$(dialog --stdout --title "$1" --inputbox "$2" 0 0 "$3")
+	
+	# Check if TTY is available before using dialog
+	if [ ! -t 0 ] || [ ! -t 1 ] || [ -z "${TERM:-}" ]; then
+		# No TTY available, use default value or prompt via echo/read
+		result="$3"
+		result_code=0
+		return 0
+	fi
+	
+	# Ensure TERM is set
+	export TERM=${TERM:-xterm}
+	
+	result=$(dialog --stdout --title "$1" --inputbox "$2" 0 0 "$3" 2>/dev/null || echo "$3")
 	result_code=$?
+	if [ $result_code -ne 0 ]; then
+		result="$3"  # Use default value if dialog failed
+	fi
 }
 
 function input_menu {
@@ -354,9 +374,28 @@ function input_menu {
 	# The exit code from dialog will be stored in VARIABLE_EXITCODE.
 	declare -n result=$4
 	declare -n result_code=$4_EXITCODE
+	
+	# Check if TTY is available before using dialog
+	if [ ! -t 0 ] || [ ! -t 1 ] || [ -z "${TERM:-}" ]; then
+		# No TTY available, use first option as default
+		local IFS=^$'\n'
+		local items=($3)
+		result="${items[0]}"
+		result_code=0
+		return 0
+	fi
+	
+	# Ensure TERM is set
+	export TERM=${TERM:-xterm}
+	
 	local IFS=^$'\n'
-	result=$(dialog --stdout --title "$1" --menu "$2" 0 0 0 $3)
+	result=$(dialog --stdout --title "$1" --menu "$2" 0 0 0 $3 2>/dev/null || echo "")
 	result_code=$?
+	if [ $result_code -ne 0 ]; then
+		# Use first option if dialog failed
+		local items=($3)
+		result="${items[0]}"
+	fi
 }
 
 function get_publicip_from_web_service {

@@ -27,7 +27,7 @@ NC=${NC:-"\033[0m"} # No Color
 
 # Enable strict mode and trap errors for safer execution
 set -euo pipefail
-trap 'print_error "error trapped"' ERR
+trap 'status=$?; line=${LINENO:-"?"}; cmd=${BASH_COMMAND:-"?"}; file=${BASH_SOURCE[0]:-${0##*/}}; print_error "Error at line $line in $file (exit status $status): $cmd"' ERR
 
 FIRST_TIME_SETUP=0
 
@@ -97,7 +97,7 @@ if [[ "$FIRST_TIME_SETUP" == "1" ]]; then
     # If not, this shows an error and exits.
     print_status "Running preflight system checks"
     # Always source preflight from this script's directory to avoid stale copies
-    source "$SCRIPT_DIR/preflight.sh"
+    bash "$SCRIPT_DIR/preflight.sh"
 
     # Ensure Python reads/writes files in UTF-8.
     if ! locale -a | grep en_US.utf8 >/dev/null; then
@@ -160,8 +160,36 @@ else
     print_success "Configured NCURSES line drawing"
 
     print_status "Loading system functions and configuration"
+    set +u
     source /etc/functions.sh
-    source /etc/yiimpool.conf
+    if [ -f /etc/yiimpool.conf ]; then
+        source /etc/yiimpool.conf
+    fi
+    set -u
+    
+    # Set default values if variables are not set (e.g., if config file was empty)
+    if [ -z "${STORAGE_USER:-}" ]; then
+        STORAGE_USER=${DEFAULT_STORAGE_USER:-"crypto-data"}
+    fi
+    if [ -z "${STORAGE_ROOT:-}" ]; then
+        STORAGE_ROOT=${DEFAULT_STORAGE_ROOT:-"/home/$STORAGE_USER"}
+    fi
+    if [ -z "${PUBLIC_IP:-}" ]; then
+        PUBLIC_IP=""
+    fi
+    if [ -z "${PUBLIC_IPV6:-}" ]; then
+        PUBLIC_IPV6=""
+    fi
+    if [ -z "${DISTRO:-}" ]; then
+        DISTRO=${DEFAULT_DISTRO:-""}
+    fi
+    if [ -z "${FIRST_TIME_SETUP:-}" ]; then
+        FIRST_TIME_SETUP="0"
+    fi
+    if [ -z "${PRIVATE_IP:-}" ]; then
+        PRIVATE_IP=${PUBLIC_IP:-""}
+    fi
+    
     print_success "Loaded system functions and configuration"
 
     # Start yiimpool

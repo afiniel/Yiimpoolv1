@@ -15,18 +15,16 @@
 #########################################################
 
 # Default version tag if not provided as environment variable
-TAG=${TAG:-v2.5.4}
+TAG=${TAG:-v2.5.5}
 
 # File paths
 YIIMPOOL_VERSION_FILE="/etc/yiimpoolversion.conf"
 YIIMPOOL_INSTALL_DIR="$HOME/Yiimpoolv1"
 
-# Function to log messages to stderr
 log_error() {
   echo "[ERROR] $1" >&2
 }
 
-# Function to install git if not already installed
 install_git() {
   if ! command -v git &>/dev/null; then
     log_error "Git is not installed. Installing git..."
@@ -38,7 +36,6 @@ install_git() {
   fi
 }
 
-# Function to clone or update the Yiimpool installer repository
 clone_or_update_repo() {
   if [ ! -d "$YIIMPOOL_INSTALL_DIR" ]; then
     echo "Cloning Yiimpool Installer ${TAG}..."
@@ -57,17 +54,16 @@ clone_or_update_repo() {
   fi
 }
 
-# Function to set the Yiimpool version in configuration file
+
 set_yiimpool_version() {
   echo "VERSION=${TAG}" | sudo tee "$YIIMPOOL_VERSION_FILE" >/dev/null
 }
 
-# Function to start the Yiimpool installation script
+
 start_installation() {
   bash "$YIIMPOOL_INSTALL_DIR/install/start.sh"
 }
 
-# Perform installation steps
 install_git
 clone_or_update_repo
 set_yiimpool_version

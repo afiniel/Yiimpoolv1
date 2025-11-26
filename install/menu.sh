@@ -14,23 +14,25 @@ source /etc/functions.sh
 
 display_version_info
 
+set +e
 RESULT=$(dialog --stdout --nocancel --default-item 1 --title "YiimPool Menu $VERSION" --menu "Choose an option" -1 55 6 \
     ' ' "- Install Yiimp -" \
     1 "Install Yiimp Single Server" \
     2 "Options" \
     3 "Exit")
 
+set -e
 case "$RESULT" in
     1)
         clear
         echo "Preparing to install Yiimp Single Server..."
         cd $HOME/Yiimpoolv1/yiimp_single
-        source start.sh
+        bash start.sh
         ;;
     2)
         clear
         cd $HOME/Yiimpoolv1/install
-        source options.sh
+        bash options.sh
         ;;
     3)
         clear

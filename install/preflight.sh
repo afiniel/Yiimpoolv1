@@ -23,8 +23,17 @@ trap 'status=$?; cmd=$BASH_COMMAND; print_error "status=$status cmd=$cmd"' ERR
 print_header "Pre-flight checks"
 
 # Identify OS
-if [[ -f /etc/lsb-release ]]; then
-
+if [[ -f /etc/rpi-issue ]]; then
+    # Raspberry Pi OS detection
+    RASBERRY_PI_DESCRIPTION=$(lsb_release -rs 2>/dev/null || cat /etc/debian_version | cut -d. -f1)
+    if [[ "${RASBERRY_PI_DESCRIPTION}" == "13" ]] || [[ "${RASBERRY_PI_DESCRIPTION}" == "12" ]] || [[ "${RASBERRY_PI_DESCRIPTION}" == "11" ]]; then
+        DISTRO=13
+    else
+        echo "This script only supports Raspberry Pi OS 13, 12, and 11. Ubuntu 16.04, 18.04, 20.04, 23.04, 24.04 and Debian 12 are also supported."
+        exit 1
+    fi
+elif [[ -f /etc/lsb-release ]]; then
+    # Ubuntu detection
     UBUNTU_DESCRIPTION=$(lsb_release -rs)
     if [[ "${UBUNTU_DESCRIPTION}" == "24.04" ]]; then
         DISTRO=24
@@ -39,26 +48,25 @@ if [[ -f /etc/lsb-release ]]; then
     elif [[ "${UBUNTU_DESCRIPTION}" == "16.04" ]]; then
         DISTRO=16
     else
-        echo "This script only supports Ubuntu 16.04, 18.04, 20.04, 23.04, and 24.04. Debian 12 is also supported."
+        echo "This script only supports Ubuntu 16.04, 18.04, 20.04, 23.04, and 24.04. Raspberry Pi OS 13, 12, 11 and Debian 12 are also supported."
         exit 1
     fi
 else
-    
+    # Debian detection
     DEBIAN_DESCRIPTION=$(cat /etc/debian_version | cut -d. -f1)
     if [[ "${DEBIAN_DESCRIPTION}" == "12" ]]; then
         DISTRO=12
     elif [[ "${DEBIAN_DESCRIPTION}" == "11" ]]; then
         DISTRO=11
     else
-        echo "This script only supports Ubuntu 16.04, 18.04, 20.04, 23.04, and 24.04. Debian 12 is also supported."
+        echo "This script only supports Ubuntu 16.04, 18.04, 20.04, 23.04, and 24.04. Raspberry Pi OS 13, 12, 11 and Debian 12 are also supported."
         exit 1
     fi
 fi
 
-# Set permissions
+
 sudo chmod g-w /etc /etc/default /usr
 
-# Check if swap is needed and allocate if necessary (robust under strict mode)
 SWAP_MOUNTED=$(cat /proc/swaps | tail -n+2)
 SWAP_IN_FSTAB=""
 if grep -q "swap" /etc/fstab 2>/dev/null; then
@@ -90,9 +98,9 @@ fi
 
 # Check architecture
 ARCHITECTURE=$(uname -m)
-if [ "$ARCHITECTURE" != "x86_64" ]; then
+if [ "$ARCHITECTURE" != "x86_64" ] && [ "$ARCHITECTURE" != "aarch64" ]; then
     if [ -z "${ARM:-}" ]; then
-        echo -e "${RED}Yiimpool Installer only supports x86_64 architecture and will not work on any other architecture, like ARM or 32-bit OS.${NC}"
+        echo -e "${RED}Yiimpool Installer only supports x86_64 and aarch64 architectures and will not work on any other architecture, like 32-bit OS or other ARM variants.${NC}"
         echo -e "${RED}Your architecture is $ARCHITECTURE.${NC}\n"
         exit 1
     fi

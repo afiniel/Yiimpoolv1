@@ -7,9 +7,14 @@
 ##################################################################################
 
 # Load required functions and configurations
+set +e
 source /etc/functions.sh
-source /etc/yiimpool.conf
-source "$HOME/Yiimpoolv1/yiimp_single/.wireguard.install.cnf"
+source /etc/yiimpool.conf 2>/dev/null || true
+source "$HOME/Yiimpoolv1/yiimp_single/.wireguard.install.cnf" 2>/dev/null || true
+set -e
+
+# Ensure TERM is set for dialog commands
+export TERM=${TERM:-xterm}
 
 # Source wireguard configuration if enabled
 if [[ ("$wireguard" == "true") ]]; then
@@ -42,24 +47,28 @@ else
 fi
 
 # Prompt for using a domain name or IP
+set +e
 dialog --title "Using Domain Name" \
---yesno "Are you using a domain name? Example: example.com?\n\nMake sure the DNS is updated!" 7 60
+--yesno "Are you using a domain name? Example: example.com?\n\nMake sure the DNS is updated!" 7 60 2>/dev/null
 response=$?
+set -e
 case $response in
    0) UsingDomain=yes;;
    1) UsingDomain=no;;
-   255) echo "[ESC] key pressed.";;
+   255) echo "[ESC] key pressed."; exit;;
 esac
 
 # If using a domain, further prompts for subdomain and domain name
 if [[ "$UsingDomain" == "yes" ]]; then
+    set +e
     dialog --title "Using Sub-Domain" \
-    --yesno "Are you using a sub-domain for the main website domain? Example: pool.example.com?\n\nMake sure the DNS is updated!" 7 60
+    --yesno "Are you using a sub-domain for the main website domain? Example: pool.example.com?\n\nMake sure the DNS is updated!" 7 60 2>/dev/null
     response=$?
+    set -e
     case $response in
        0) UsingSubDomain=yes;;
        1) UsingSubDomain=no;;
-       255) echo "[ESC] key pressed.";;
+       255) echo "[ESC] key pressed."; exit;;
     esac
 
     # Input box for domain name
@@ -89,28 +98,49 @@ if [[ "$UsingDomain" == "yes" ]]; then
     fi
 
     # Prompt for automatic SSL installation
+    set +e
     dialog --title "Install SSL" \
-    --yesno "Would you like the system to install SSL automatically?" 7 60
+    --yesno "Would you like the system to install SSL automatically?" 7 60 2>/dev/null
     response=$?
+    set -e
     case $response in
        0) InstallSSL=yes;;
        1) InstallSSL=no;;
-       255) echo "[ESC] key pressed.";;
+       255) echo "[ESC] key pressed."; exit;;
     esac
 else
     # Set DomainName and StratumURL to server IP if not using a domain
-    DomainName=$(get_publicip_from_web_service 4 || get_default_privateip 4)
+    # Use error handling to prevent script failure if IP detection fails
+    set +e
+    DomainName=$(get_publicip_from_web_service 4 2>/dev/null || get_default_privateip 4 2>/dev/null)
+    set -e
+    
+    # If IP detection failed or returned empty, prompt user for IP address
+    if [ -z "${DomainName:-}" ]; then
+        DEFAULT_DomainName=$(get_default_privateip 4 2>/dev/null || echo "127.0.0.1")
+        input_box "Server IP Address" \
+        "Unable to automatically detect your server's IP address.\n\nPlease enter your server's public IP address:\n\nServer IP Address:" \
+        "${DEFAULT_DomainName}" \
+        DomainName
+        
+        if [ -z "${DomainName}" ]; then
+            # If user didn't provide IP, use the default
+            DomainName="${DEFAULT_DomainName}"
+        fi
+    fi
     StratumURL=${DomainName}
     UsingSubDomain=no
     
     # Add SSL prompt even when using IP
+    set +e
     dialog --title "Install SSL" \
-    --yesno "Would you like the system to install SSL automatically?\n\nNote: Self-signed SSL will be used when installing with IP address." 8 60
+    --yesno "Would you like the system to install SSL automatically?\n\nNote: Self-signed SSL will be used when installing with IP address." 8 60 2>/dev/null
     response=$?
+    set -e
     case $response in
        0) InstallSSL=yes;;
        1) InstallSSL=no;;
-       255) echo "[ESC] key pressed.";;
+       255) echo "[ESC] key pressed."; exit;;
     esac
 fi
 
@@ -271,6 +301,7 @@ StratumDBUser=Stratum$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 13)
 clear
 
 # Display confirmation dialog for user to verify inputs
+set +e
 dialog --title "Verify Your Responses" \
 --yesno "Please verify your input before continuing:
 Using Domain          : ${UsingDomain}
@@ -280,11 +311,12 @@ Stratum URL          : ${StratumURL}
 Install SSL           : ${InstallSSL}
 System Email          : ${SupportEmail}
 Your Public IP        : ${PublicIP}
-phpMyAdmin Username   : ${PHPMyAdminUser}" 17 60
+phpMyAdmin Username   : ${PHPMyAdminUser}" 17 60 2>/dev/null
 
 # Get exit status of confirmation dialog
 # 0 means user confirmed, 1 means user canceled
 response=$?
+set -e
 case $response in
     0)
         # Save configuration to .yiimp.conf
