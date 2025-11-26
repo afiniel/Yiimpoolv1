@@ -63,32 +63,31 @@ cd $STORAGE_ROOT/daemon_builder/temp_coin_builds
 # Gitcoin coin information.
 input_box "Coin Information" \
 "Please enter the Coin Symbol. Example: BTC
-\n\n*Paste press CTRL+RIGHT mouse button.
+\n\n*To paste, use Ctrl+Shift+V (or right-click in some terminals).
 \n\nCoin Name:" \
 "" \
 coin
 
 if [[ ("${precompiled}" == "true") ]]; then
-    input_box "precompiled Coin Information" \
-    "Please enter the precompiled file format compressed! 
+    input_box "Precompiled Coin Information" \
+    "Please enter the URL link to the precompiled compressed file. 
     \n\nExample: bitcoin-0.16.3-x86_64-linux-gnu.tar.gz
-    \n\n .zip format is also supported.
-    \n\n*Paste press CTRL+RIGHT mouse button.
-    \n\nprecompiled Coin URL Link:" \
+    \n\nSupported formats: .tar.gz, .zip, .7z
+    \n\n*To paste, use Ctrl+Shift+V (or right-click in some terminals).
+    \n\nPrecompiled Coin URL Link:" \
     "" \
     coin_precompiled
 else
-    input_box "Github Repo link" \
-    "Please enter the Github Repo link.
+    input_box "GitHub Repository Link" \
+    "Please enter the GitHub repository link.
     \n\nExample: https://github.com/example-repo-name/coin-wallet.git
-    \n\n*Paste press CTRL+RIGHT mouse button.
-    \n\nGithub Repo link:" \
+    \n\n*To paste, use Ctrl+Shift+V (or right-click in some terminals).
+    \n\nGitHub Repository Link:" \
     "" \
     git_hub
     
-    dialog --title " Switch To development " \
-    --yesno "Switch from main repo git in to develop?
-    Selecting Yes use Git developments." 6 50
+    dialog --title "Switch To Development Branch" \
+    --yesno "Switch from main repository branch to develop?\n\nSelecting Yes will use the Git development branch." 7 60
     response=$?
     case $response in
         0) swithdevelop=yes;;
@@ -98,9 +97,8 @@ else
     
     if [[ ("${swithdevelop}" == "no") ]]; then
         
-        dialog --title " Do you want to use a specific branch? " \
-        --yesno "Do you need to use a specific github branch of the coin?
-        Selecting Yes use a selected version Git." 7 60
+        dialog --title "Use Specific Git Branch" \
+        --yesno "Do you need to use a specific GitHub branch of the coin?\n\nSelecting Yes will allow you to specify a particular Git branch version." 8 60
         response=$?
         case $response in
             0) branch_git_hub=yes;;
@@ -110,11 +108,11 @@ else
         
         if [[ ("${branch_git_hub}" == "yes") ]]; then
             
-            input_box "Github Repo link" \
-    		"Please enter the Github Repo link.
+            input_box "GitHub Repository Link" \
+    		"Please enter the GitHub repository link.
 			\n\nExample: https://github.com/example-repo-name/coin-wallet.git
-    		\n\n*Paste press CTRL+RIGHT mouse button.
-    		\n\nGithub Repo link:" \
+    		\n\n*To paste, use Ctrl+Shift+V (or right-click in some terminals).
+    		\n\nGitHub Repository Link:" \
     		"" \
     		git_hub
         fi
@@ -152,9 +150,9 @@ if [[ ! -e $coindir ]]; then
     errorexist="false"
 else
     echo
-    message_box " Coin already exist temp folder " \
-    "${coindir} already exists.... in temp folder Skipping Installation!
-    \n\nIf there was an error in the build use the build error options on the installer."
+    message_box "Coin Already Exists in Temp Folder" \
+    "${coindir} already exists in the temp folder. Skipping installation!
+    \n\nIf there was an error in the build, use the build error options on the installer."
     
     errorexist="true"
     exit 0

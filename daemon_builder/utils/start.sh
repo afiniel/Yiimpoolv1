@@ -32,17 +32,17 @@ export NCURSES_NO_UTF8_ACS=1
 
 if (( $EUID == 0 )); then
 	# Welcome
-	message_box "daemonbuilder" \
-	"Hello and thanks for using the daemonbuilder
-	\nYou are logged in to ROOT
-	\n\nIMPORTANT: Please run this scrypt logged in USER Thanks you."
+	message_box "DaemonBuilder" \
+	"Hello and thanks for using the DaemonBuilder!
+	\nYou are logged in as ROOT.
+	\n\nIMPORTANT: Please run this script logged in as a regular USER. Thank you."
 	cd ..
 	cd ~
 	clear
 	exit;
 else
-	message_box " Daemon Installer " \
-	"Warning! This Scrypt only works with servers setup with the Yiimpool installer!
+	message_box "Daemon Installer" \
+	"Warning! This script only works with servers set up with the Yiimpool installer!
 	\n\nSetup for the most part is fully automated. Very little user input is required."
 
 	# Start the installation.

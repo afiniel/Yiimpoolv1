@@ -62,7 +62,7 @@ print_header "Coin Configuration"
 
 input_box "Coin Information" \
 "Please enter the Coin Symbol. Example: BTC
-\n\n*Paste press CTRL+RIGHT mouse button.
+\n\n*To paste, use Ctrl+Shift+V (or right-click in some terminals).
 \n\nCoin Name:" \
 "" \
 coin
@@ -109,26 +109,26 @@ if [[ ("$precompiled" == "true") ]]; then
     print_status "Preparing to install precompiled binary..."
     
     input_box "Precompiled Binary Information" \
-    "Please enter the precompiled file format compressed! 
+    "Please enter the URL link to the precompiled compressed file. 
     \n\nExample: bitcoin-0.16.3-x86_64-linux-gnu.tar.gz
-    \n\n .zip format is also supported.
-    \n\n*Paste press CTRL+RIGHT mouse button.
+    \n\nSupported formats: .tar.gz, .zip, .7z
+    \n\n*To paste, use Ctrl+Shift+V (or right-click in some terminals).
     \n\nPrecompiled Binary URL:" \
     "" \
     coin_precompiled
 else
     print_header "Source Code"
     
-    input_box "Github Repository" \
-    "Please enter the Github Repo link.
+    input_box "GitHub Repository" \
+    "Please enter the GitHub repository link.
     \n\nExample: https://github.com/example-repo-name/coin-wallet.git
-    \n\n*Paste press CTRL+RIGHT mouse button.
-    \n\nGithub Repo link:" \
+    \n\n*To paste, use Ctrl+Shift+V (or right-click in some terminals).
+    \n\nGitHub Repository Link:" \
     "" \
     git_hub
     
-    dialog --title " Development Branch Selection " \
-    --yesno "Would you like to use the development branch instead of main?\nSelect Yes to use the development branch." 7 60
+    dialog --title "Development Branch Selection" \
+    --yesno "Would you like to use the development branch instead of main?\n\nSelect Yes to use the development branch." 8 60
     response=$?
     case $response in
         0) 
@@ -146,8 +146,8 @@ else
     esac
     
     if [[ ("${swithdevelop}" == "no") ]]; then
-        dialog --title " Branch Selection " \
-        --yesno "Would you like to use a specific branch?\nSelect Yes to specify a version." 7 60
+        dialog --title "Branch Selection" \
+        --yesno "Would you like to use a specific branch?\n\nSelect Yes to specify a particular version." 8 60
         response=$?
         case $response in
             0) 
@@ -165,10 +165,10 @@ else
         esac
         
         if [[ ("${branch_git_hub}" == "yes") ]]; then
-            input_box "Branch Selection" \
+            input_box "Git Branch Selection" \
             "Please enter the branch name to use.
             \n\nExample: v1.2.3 or feature/new-update
-            \n\n*Paste press CTRL+RIGHT mouse button.
+            \n\n*To paste, use Ctrl+Shift+V (or right-click in some terminals).
             \n\nBranch name:" \
             "" \
             branch_git_hub_ver

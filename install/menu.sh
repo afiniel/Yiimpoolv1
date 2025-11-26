@@ -1,10 +1,10 @@
 #!/bin/env bash
 
 #
-# YiimPool Menu Script
+# Yiimpool Menu Script
 #
 # Author: Afiniel
-# Updated: 2023-03-16
+# Updated: 2025-02-16
 #
 
 # Load configuration and functions
@@ -15,9 +15,9 @@ source /etc/functions.sh
 display_version_info
 
 set +e
-RESULT=$(dialog --stdout --nocancel --default-item 1 --title "YiimPool Menu $VERSION" --menu "Choose an option" -1 55 6 \
-    ' ' "- Install Yiimp -" \
-    1 "Install Yiimp Single Server" \
+RESULT=$(dialog --stdout --nocancel --default-item 1 --title "Yiimpool Menu $VERSION" --menu "Choose an option" -1 55 6 \
+    ' ' "- Install YiiMP -" \
+    1 "Install YiiMP Single Server" \
     2 "Options" \
     3 "Exit")
 
@@ -25,7 +25,7 @@ set -e
 case "$RESULT" in
     1)
         clear
-        echo "Preparing to install Yiimp Single Server..."
+        echo "Preparing to install YiiMP Single Server..."
         cd $HOME/Yiimpoolv1/yiimp_single
         bash start.sh
         ;;
@@ -37,7 +37,7 @@ case "$RESULT" in
     3)
         clear
         motd
-        echo -e "${GREEN}Exiting YiimPool Menu${NC}"
+        echo -e "${GREEN}Exiting Yiimpool Menu${NC}"
         echo -e "${YELLOW}Type 'yiimpool' anytime to return to the menu${NC}"
         exit 0
         ;;

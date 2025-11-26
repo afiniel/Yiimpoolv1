@@ -18,9 +18,9 @@ clear
 
 # Welcome
 message_box "Yiimpool Installer $VERSION" \
-"Hello and thanks for using the Yiimpool Yiimp Installer!
+"Hello and thanks for using the Yiimpool YiiMP Installer!
 \n\nInstallation for the most part is fully automated. In most cases any user responses that are needed are asked prior to the installation.
-\n\nNOTE: You should only install this on a brand new Ubuntu 20.04 , Ubuntu 18.04 or Ubuntu 16.04 installation."
+\n\nNOTE: You should only install this on a brand new Ubuntu 22.04 LTS, Ubuntu 24.04 LTS, or Debian 12 installation."
 
 message_box "Yiimpool Installer $VERSION" \
 "WARNING: You are about to run this script as root!
@@ -30,8 +30,9 @@ message_box "Yiimpool Installer $VERSION" \
 # Ask if SSH key or password user
 set +e
 dialog --title "Create New User With SSH Key" \
---yesno "Do you want to create new user with SSH key login?
-Selecting no will create user with password login only." 7 60 2>/dev/null
+--yesno "Do you want to create a new user with SSH key login?
+
+Selecting No will create a user with password login only." 8 60 2>/dev/null
 response=$?
 set -e
 case $response in
@@ -59,8 +60,9 @@ if [[ ("$UsingSSH" == "yes") ]]; then
 
     if [ -z "${ssh_key:-}" ]; then
         DEFAULT_ssh_key=PublicKey
-        input_box "Please open PuTTY Key Generator on your local machine and generate a new public key." \
-            "To paste your Public key use ctrl shift right click.
+        input_box "SSH Public Key" \
+            "Please enter your SSH public key. You can generate one using ssh-keygen on Linux/Mac or PuTTYgen on Windows.
+      \n\nTo paste your public key, use Ctrl+Shift+V (or right-click in some terminals).
       \n\nPublic Key:" \
             ${DEFAULT_ssh_key} \
             ssh_key
@@ -216,7 +218,7 @@ fi
 # New User Password Login Creation
 if [ -z "${yiimpadmin:-}" ]; then
     DEFAULT_yiimpadmin=yiimpadmin
-    input_box "Creaete new username" \
+    input_box "Create New Username" \
         "Please enter your new username.
   \n\nUser Name:" \
         ${DEFAULT_yiimpadmin} \
@@ -231,8 +233,8 @@ fi
 if [ -z "${RootPassword:-}" ]; then
     DEFAULT_RootPassword=$(openssl rand -base64 8 | tr -d "=+/")
     input_box "User Password" \
-        "Enter your new user password or use this randomly system generated one.
-  \n\nUnfortunatley dialog doesnt let you copy. So you have to write it down.
+        "Enter your new user password or use this randomly system-generated one.
+  \n\nUnfortunately, dialog doesn't let you copy. So you have to write it down.
   \n\nUser password:" \
         ${DEFAULT_RootPassword} \
         RootPassword
@@ -246,7 +248,7 @@ fi
 clear
 
 set +e
-dialog --title "Verify Your input" \
+dialog --title "Verify Your Input" \
     --yesno "Please verify your answers before you continue:
 New User Name : ${yiimpadmin}
 New User Pass : ${RootPassword}" 8 60 2>/dev/null

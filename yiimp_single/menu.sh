@@ -11,8 +11,8 @@
 source /etc/yiimpooldonate.conf
 source /etc/functions.sh
 
-RESULT=$(dialog --stdout --default-item 1 --title "YiimPool Yiimp Installer $VERSION" --menu "choose an option" -1 55 7 \
-    ' ' "- Do you want to install Yiimp with WireGuard? -" \
+RESULT=$(dialog --stdout --default-item 1 --title "Yiimpool YiiMP Installer $VERSION" --menu "Choose an option" -1 55 7 \
+    ' ' "- Do you want to install YiiMP with WireGuard? -" \
     1 "Yes" \
     2 "No" \
     3 exit)

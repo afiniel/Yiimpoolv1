@@ -14,7 +14,7 @@ source /etc/functions.sh
 source /etc/yiimpoolversion.conf
 
 show_menu() {  
-    RESULT=$(dialog --stdout --title "YiimPool Menu $VERSION" --menu "Choose an option" -1 60 8 \
+    RESULT=$(dialog --stdout --title "Yiimpool Menu $VERSION" --menu "Choose an option" -1 60 8 \
         ' ' "═══════════  Options ═══════════" \
         1 "Upgrade Stratum Only" \
         2 "Add Stratum" \
@@ -70,7 +70,7 @@ show_menu() {
         7)
             clear
             motd
-            echo -e "${GREEN}Exiting YiimPool Menu${NC}"
+            echo -e "${GREEN}Exiting Yiimpool Menu${NC}"
             echo -e "${YELLOW}Type 'yiimpool' anytime to return to the menu${NC}"
             exit 0
             ;;

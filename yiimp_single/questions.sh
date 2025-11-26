@@ -23,33 +23,35 @@ fi
 
 # Display installation type based on wireguard setting
 if [[ ("$wireguard" == "true") ]]; then
-    message_box "Yiimpool Yiimp installer" \
-    "You have chosen to install Yiimp with WireGuard!
+    message_box "Yiimpool YiiMP Installer" \
+    "You have chosen to install YiiMP with WireGuard!
     
     This option will install all components of YiiMP on a single server along with WireGuard so you can easily add additional servers in the future.
     
-    Please make sure any domain name or subdomain names are pointed to this server's IP before running this installer.
+    Please make sure any domain name or subdomain names are pointed to this server's IP address before running this installer.
     
     After answering the following questions, setup will be automated.
     
-    NOTE: If installing on a system with less than 8 GB of RAM, you may experience system issues!"
+    NOTE: It is recommended to have at least 8 GB of RAM for optimal performance."
 else
-    message_box "Yiimpool Yiimp installer" \
-    "You have chosen to install Yiimp without WireGuard!
+    message_box "Yiimpool YiiMP Installer" \
+    "You have chosen to install YiiMP without WireGuard!
     
     This option will install all components of YiiMP on a single server.
     
-    Please make sure any domain name or subdomain names are pointed to this server's IP before running this installer.
+    Please make sure any domain name or subdomain names are pointed to this server's IP address before running this installer.
     
     After answering the following questions, setup will be automated.
     
-    NOTE: If installing on a system with less than 8 GB of RAM, you may experience system issues!"
+    NOTE: It is recommended to have at least 8 GB of RAM for optimal performance."
 fi
 
 # Prompt for using a domain name or IP
 set +e
 dialog --title "Using Domain Name" \
---yesno "Are you using a domain name? Example: example.com?\n\nMake sure the DNS is updated!" 7 60 2>/dev/null
+--yesno "Are you using a domain name? Example: example.com
+
+Make sure the DNS is updated and pointing to this server's IP address!" 8 60 2>/dev/null
 response=$?
 set -e
 case $response in
@@ -62,7 +64,9 @@ esac
 if [[ "$UsingDomain" == "yes" ]]; then
     set +e
     dialog --title "Using Sub-Domain" \
-    --yesno "Are you using a sub-domain for the main website domain? Example: pool.example.com?\n\nMake sure the DNS is updated!" 7 60 2>/dev/null
+    --yesno "Are you using a sub-domain for the main website domain? Example: pool.example.com
+
+Make sure the DNS is updated and pointing to this server's IP address!" 8 60 2>/dev/null
     response=$?
     set -e
     case $response in
@@ -75,7 +79,13 @@ if [[ "$UsingDomain" == "yes" ]]; then
     if [ -z "${DomainName:-}" ]; then
         DEFAULT_DomainName=example.com
         input_box "Domain Name" \
-        "Enter your domain name. If using a subdomain, enter the full domain as in pool.example.com.\n\nDo not add www. to the domain name.\n\nMake sure the domain is pointed to this server before continuing!\n\nDomain Name:" \
+        "Enter your domain name. If using a subdomain, enter the full domain as in pool.example.com.
+
+Do not add www. to the domain name.
+
+Make sure the domain DNS is pointed to this server's IP address before continuing!
+
+Domain Name:" \
         "${DEFAULT_DomainName}" \
         DomainName
 
@@ -88,7 +98,11 @@ if [[ "$UsingDomain" == "yes" ]]; then
     if [ -z "${StratumURL:-}" ]; then
         DEFAULT_StratumURL=${DomainName}
         input_box "Stratum URL" \
-        "Enter your stratum URL. It is recommended to use another subdomain such as stratum.${DomainName}.\n\nDo not add www. to the domain name.\n\nStratum URL:" \
+        "Enter your stratum URL. It is recommended to use another subdomain such as stratum.${DomainName}.
+
+Do not add www. to the domain name.
+
+Stratum URL:" \
         "${DEFAULT_StratumURL}" \
         StratumURL
 
@@ -100,7 +114,9 @@ if [[ "$UsingDomain" == "yes" ]]; then
     # Prompt for automatic SSL installation
     set +e
     dialog --title "Install SSL" \
-    --yesno "Would you like the system to install SSL automatically?" 7 60 2>/dev/null
+    --yesno "Would you like the system to install SSL automatically?
+
+This will configure HTTPS for secure connections." 8 60 2>/dev/null
     response=$?
     set -e
     case $response in
@@ -119,7 +135,11 @@ else
     if [ -z "${DomainName:-}" ]; then
         DEFAULT_DomainName=$(get_default_privateip 4 2>/dev/null || echo "127.0.0.1")
         input_box "Server IP Address" \
-        "Unable to automatically detect your server's IP address.\n\nPlease enter your server's public IP address:\n\nServer IP Address:" \
+        "Unable to automatically detect your server's IP address.
+
+Please enter your server's public IP address:
+
+Server IP Address:" \
         "${DEFAULT_DomainName}" \
         DomainName
         
@@ -134,7 +154,9 @@ else
     # Add SSL prompt even when using IP
     set +e
     dialog --title "Install SSL" \
-    --yesno "Would you like the system to install SSL automatically?\n\nNote: Self-signed SSL will be used when installing with IP address." 8 60 2>/dev/null
+    --yesno "Would you like the system to install SSL automatically?
+
+Note: Self-signed SSL certificate will be used when installing with an IP address (browsers will show a security warning)." 9 60 2>/dev/null
     response=$?
     set -e
     case $response in
@@ -148,7 +170,9 @@ fi
 if [ -z "${SupportEmail:-}" ]; then
     DEFAULT_SupportEmail=root@localhost
     input_box "System Email" \
-    "Enter an email address for the system to send alerts and other important messages.\n\nSystem Email:" \
+    "Enter an email address for the system to send alerts and other important messages.
+
+System Email:" \
     "${DEFAULT_SupportEmail}" \
     SupportEmail
 
@@ -166,7 +190,13 @@ if [ -z "${PublicIP:-}" ]; then
     fi
 
     input_box "Your Public IP" \
-    "Enter your public IP from the remote system you will access your admin panel from.\n\nWe have guessed your public IP from the IP used to access this system.\n\nGo to whatsmyip.org if you are unsure if this is your public IP.\n\nYour Public IP:" \
+    "Enter your public IP address from the remote system you will access your admin panel from.
+
+We have guessed your public IP from the IP address used to access this system.
+
+If you are unsure, you can check your public IP using online services or your router's status page.
+
+Your Public IP:" \
     "${DEFAULT_PublicIP}" \
     PublicIP
 
@@ -182,7 +212,11 @@ generate_random_password_database() {
     if [ -z "${!variable_name:-}" ]; then
         local default_password=$(openssl rand -base64 29 | tr -d "=+/")
         input_box "Database Password" \
-        "Enter your desired database password.\n\nYou may use the system generated password shown.\n\nDesired Database Password:" \
+        "Enter your desired database password.
+
+You may use the system-generated password shown below.
+
+Desired Database Password:" \
         "${default_password}" \
         "${variable_name}"
 
@@ -199,7 +233,13 @@ generate_random_password_yiimp_admin() {
     if [ -z "${!variable_name:-}" ]; then
         local default_password=$(openssl rand -base64 29 | tr -d "=+/")
         input_box "Admin Password" \
-        "Enter your desired admin password for YiiMP panel.\n\nYou may use the system generated password shown.\n\nThis will be used to login to your admin panel.\n\nDesired Admin Password:" \
+        "Enter your desired admin password for YiiMP panel.
+
+You may use the system-generated password shown below.
+
+This will be used to log in to your admin panel.
+
+Desired Admin Password:" \
         "${default_password}" \
         "${variable_name}"
 
@@ -216,7 +256,13 @@ generate_random_password_blocknotify() {
     if [ -z "${!variable_name:-}" ]; then
         local default_password=$(openssl rand -base64 29 | tr -d "=+/")
         input_box "Blocknotify Password" \
-        "Enter your desired blocknotify password.\n\nYou may use the system generated password shown.\n\nThis will be used for coin blocknotify.\n\nDesired Blocknotify Password:" \
+        "Enter your desired blocknotify password.
+
+You may use the system-generated password shown below.
+
+This will be used for coin blocknotify.
+
+Desired Blocknotify Password:" \
         "${default_password}" \
         "${variable_name}"
 
@@ -233,7 +279,13 @@ generate_yiimp_admin_user() {
     if [ -z "${!variable_name:-}" ]; then
         local default_username="admin"
         input_box "Admin Username" \
-        "Enter your desired admin username for YiiMP panel.\n\nThis will be used to login to your admin panel.\n\nDefault username is 'admin'.\n\nDesired Admin Username:" \
+        "Enter your desired admin username for YiiMP panel.
+
+This will be used to log in to your admin panel.
+
+Default username is 'admin'.
+
+Desired Admin Username:" \
         "${default_username}" \
         "${variable_name}"
 
@@ -250,7 +302,13 @@ generate_phpmyadmin_user() {
     if [ -z "${!variable_name:-}" ]; then
         local default_username="phpmyadmin"
         input_box "phpMyAdmin Username" \
-        "Enter your desired username for phpMyAdmin.\n\nThis will be used to login to phpMyAdmin.\n\nDefault username is 'phpmyadmin'.\n\nDesired phpMyAdmin Username:" \
+        "Enter your desired username for phpMyAdmin.
+
+This will be used to log in to phpMyAdmin.
+
+Default username is 'phpmyadmin'.
+
+Desired phpMyAdmin Username:" \
         "${default_username}" \
         "${variable_name}"
 
@@ -267,7 +325,13 @@ generate_random_password_phpmyadmin() {
     if [ -z "${!variable_name:-}" ]; then
         local default_password=$(openssl rand -base64 29 | tr -d "=+/")
         input_box "phpMyAdmin Password" \
-        "Enter your desired password for phpMyAdmin.\n\nYou may use the system generated password shown.\n\nThis will be used to login to phpMyAdmin.\n\nDesired phpMyAdmin Password:" \
+        "Enter your desired password for phpMyAdmin.
+
+You may use the system-generated password shown below.
+
+This will be used to log in to phpMyAdmin.
+
+Desired phpMyAdmin Password:" \
         "${default_password}" \
         "${variable_name}"
 
@@ -304,10 +368,11 @@ clear
 set +e
 dialog --title "Verify Your Responses" \
 --yesno "Please verify your input before continuing:
+
 Using Domain          : ${UsingDomain}
 Using Sub-Domain      : ${UsingSubDomain}
 Domain Name           : ${DomainName}
-Stratum URL          : ${StratumURL}
+Stratum URL           : ${StratumURL}
 Install SSL           : ${InstallSSL}
 System Email          : ${SupportEmail}
 Your Public IP        : ${PublicIP}
