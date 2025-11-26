@@ -108,6 +108,12 @@ SQL_FILES=(
     2025-02-13-add_xelisv2-pepew.sql
     2025-02-23-add_algo_kawpow.sql
     2025-03-31-rename_table_exchange.sql
+    2025-10-05-add_argon2d1000.sql
+    2025-10-07-add_yespowerADVC.sql
+    2025-10-27-add_flex.sql
+    2025-10-27-add_rinhash.sql
+    2025-10-28-add_algo_phihash.sql
+    2025-11-19-add_algo_meowpow.sql
 )
 
 for file in "${SQL_FILES[@]}"; do
