@@ -15,7 +15,7 @@ source /etc/functions.sh
 display_version_info
 
 set +e
-RESULT=$(dialog --stdout --nocancel --default-item 1 --title "Yiimpool Menu $VERSION" --menu "Choose an option" -1 55 6 \
+RESULT=$(dialog --stdout --nocancel --default-item 1 --title "Yiimpool Menu $VERSION" --menu "Choose an option" -1 55 4 \
     ' ' "- Install YiiMP -" \
     1 "Install YiiMP Single Server" \
     2 "Options" \
