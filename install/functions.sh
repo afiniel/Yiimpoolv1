@@ -360,11 +360,14 @@ function input_box {
 	
 	# Ensure TERM is set
 	export TERM=${TERM:-xterm}
-	
-	result=$(dialog --stdout --title "$1" --inputbox "$2" 0 0 "$3" 2>/dev/null || echo "$3")
+
+	# Run dialog and capture its exit status directly (no fallback in the same command)
+	result=$(dialog --stdout --title "$1" --inputbox "$2" 0 0 "$3" 2>/dev/null)
 	result_code=$?
-	if [ $result_code -ne 0 ]; then
-		result="$3"  # Use default value if dialog failed
+
+	# If dialog failed/canceled or returned an empty string, fall back to default
+	if [ $result_code -ne 0 ] || [ -z "${result}" ]; then
+		result="$3"
 	fi
 }
 
@@ -389,10 +392,10 @@ function input_menu {
 	export TERM=${TERM:-xterm}
 	
 	local IFS=^$'\n'
-	result=$(dialog --stdout --title "$1" --menu "$2" 0 0 0 $3 2>/dev/null || echo "")
+	result=$(dialog --stdout --title "$1" --menu "$2" 0 0 0 $3 2>/dev/null)
 	result_code=$?
-	if [ $result_code -ne 0 ]; then
-		# Use first option if dialog failed
+	if [ $result_code -ne 0 ] || [ -z "${result}" ]; then
+		# Use first option if dialog failed or gave no selection
 		local items=($3)
 		result="${items[0]}"
 	fi
