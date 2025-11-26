@@ -46,7 +46,7 @@ fi
 # doesn't have an IPv6, don't ask for one.
 if [ -z "${PUBLIC_IPV6:-}" ]; then
 	# Ask the Internet.
-	GUESSED_IP=$(get_publicip_from_web_service 6)
+	GUESSED_IP=$(get_publicip_from_web_service 6 2>/dev/null) || GUESSED_IP=""
 	MATCHED=0
 	if [[ -z "${DEFAULT_PUBLIC_IPV6:-}" && ! -z "$GUESSED_IP" ]]; then
 		PUBLIC_IPV6=$GUESSED_IP
@@ -56,7 +56,7 @@ if [ -z "${PUBLIC_IPV6:-}" ]; then
 		PUBLIC_IPV6=$GUESSED_IP
 		MATCHED=1
 	elif [[ -z "${DEFAULT_PUBLIC_IPV6:-}" ]]; then
-		DEFAULT_PUBLIC_IP=$(get_default_privateip 6)
+		DEFAULT_PUBLIC_IP=$(get_default_privateip 6 2>/dev/null) || DEFAULT_PUBLIC_IP=""
 	fi
 
 	if [[ -z "${PUBLIC_IPV6:-}" && $MATCHED == 0 ]]; then
@@ -93,11 +93,11 @@ fi
 # fi
 
 # Automatic configuration, e.g. as used in our Vagrant configuration.
-if [ "$PUBLIC_IP" = "auto" ]; then
+if [ "${PUBLIC_IP:-}" = "auto" ]; then
 # Use a public API to get our public IP address, or fall back to local network configuration.
 PUBLIC_IP=$(get_publicip_from_web_service 4 || get_default_privateip 4)
 fi
-if [ "$PUBLIC_IPV6" = "auto" ]; then
+if [ "${PUBLIC_IPV6:-}" = "auto" ]; then
 # Use a public API to get our public IPv6 address, or fall back to local network configuration.
 PUBLIC_IPV6=$(get_publicip_from_web_service 6 || get_default_privateip 6)
 fi

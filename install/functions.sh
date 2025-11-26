@@ -409,7 +409,10 @@ function get_publicip_from_web_service {
 	#
 	# Pass '4' or '6' as an argument to this function to specify
 	# what type of address to get (IPv4, IPv6).
-	curl -$1 --fail --silent --max-time 15 icanhazip.com 2>/dev/null
+	# If the lookup fails or times out (e.g. curl exit status 28),
+	# swallow the error so that strict error handling (`set -e` / ERR traps)
+	# in the calling scripts do not abort the whole installer.
+	curl -$1 --fail --silent --max-time 15 icanhazip.com 2>/dev/null || true
 }
 
 function get_default_privateip {
