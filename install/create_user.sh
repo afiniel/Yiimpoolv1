@@ -9,36 +9,30 @@
 
 source /etc/yiimpoolversion.conf
 source /etc/functions.sh
-
-# Ensure TERM is set for dialog commands
-export TERM=${TERM:-xterm}
-
 cd ~/Yiimpoolv1/install
 clear
 
 # Welcome
 message_box "Yiimpool Installer $VERSION" \
-"Hello and thanks for using the Yiimpool YiiMP Installer!
+"Hello and thanks for using the Yiimpool Yiimp Installer!
 \n\nInstallation for the most part is fully automated. In most cases any user responses that are needed are asked prior to the installation.
-\n\nNOTE: You should only install this on a brand new Ubuntu 22.04 LTS, Ubuntu 24.04 LTS, or Debian 12 installation."
+\n\nNOTE: You should only install this on a brand new Ubuntu 20.04 , Ubuntu 18.04 or Ubuntu 16.04 installation."
 
+# Root warning message box
 message_box "Yiimpool Installer $VERSION" \
 "WARNING: You are about to run this script as root!
 \n\n The program will create a new user account with sudo privileges. 
 \n\nThe next step, you will be asked to create a new user account, you can name it whatever you want."
 
 # Ask if SSH key or password user
-set +e
 dialog --title "Create New User With SSH Key" \
---yesno "Do you want to create a new user with SSH key login?
-
-Selecting No will create a user with password login only." 8 60 2>/dev/null
+--yesno "Do you want to create new user with SSH key login?
+Selecting no will create user with password login only." 7 60
 response=$?
-set -e
 case $response in
 0) UsingSSH=yes ;;
 1) UsingSSH=no ;;
-255) echo "[ESC] key pressed."; exit ;;
+255) echo "[ESC] key pressed." ;;
 esac
 
 # If Using SSH Key Login
@@ -53,16 +47,15 @@ if [[ ("$UsingSSH" == "yes") ]]; then
             yiimpadmin
 
         if [ -z "${yiimpadmin}" ]; then
-           
+            # user hit ESC/cancel
             exit
         fi
     fi
 
     if [ -z "${ssh_key:-}" ]; then
         DEFAULT_ssh_key=PublicKey
-        input_box "SSH Public Key" \
-            "Please enter your SSH public key. You can generate one using ssh-keygen on Linux/Mac or PuTTYgen on Windows.
-      \n\nTo paste your public key, use Ctrl+Shift+V (or right-click in some terminals).
+        input_box "Please open PuTTY Key Generator on your local machine and generate a new public key." \
+            "To paste your Public key use ctrl shift right click.
       \n\nPublic Key:" \
             ${DEFAULT_ssh_key} \
             ssh_key
@@ -108,66 +101,6 @@ if [[ ("$UsingSSH" == "yes") ]]; then
     cd $HOME/Yiimpoolv1/install
     source pre_setup.sh
 
-    # Set STORAGE_USER and STORAGE_ROOT to default values if not already set
-    if [ -z "${STORAGE_USER:-}" ]; then
-        STORAGE_USER=${DEFAULT_STORAGE_USER:-"crypto-data"}
-    fi
-    if [ -z "${STORAGE_ROOT:-}" ]; then
-        STORAGE_ROOT=${DEFAULT_STORAGE_ROOT:-"/home/$STORAGE_USER"}
-    fi
-
-    # Detect OS and set DISTRO if not already set
-    if [ -z "${DISTRO:-}" ]; then
-        if [[ -f /etc/rpi-issue ]]; then
-            # Raspberry Pi OS detection
-            RASBERRY_PI_DESCRIPTION=$(lsb_release -rs 2>/dev/null || cat /etc/debian_version | cut -d. -f1)
-            if [[ "${RASBERRY_PI_DESCRIPTION}" == "13" ]] || [[ "${RASBERRY_PI_DESCRIPTION}" == "12" ]] || [[ "${RASBERRY_PI_DESCRIPTION}" == "11" ]]; then
-                DISTRO=13
-            else
-                DISTRO=13  # Default to 13 for Raspberry Pi if unknown version
-            fi
-        elif [[ -f /etc/lsb-release ]]; then
-            # Ubuntu detection
-            UBUNTU_DESCRIPTION=$(lsb_release -rs)
-            if [[ "${UBUNTU_DESCRIPTION}" == "24.04" ]]; then
-                DISTRO=24
-            elif [[ "${UBUNTU_DESCRIPTION}" == "23.04" ]]; then
-                DISTRO=23
-            elif [[ "${UBUNTU_DESCRIPTION}" == "22.04" ]]; then
-                DISTRO=22
-            elif [[ "${UBUNTU_DESCRIPTION}" == "20.04" ]]; then
-                DISTRO=20
-            elif [[ "${UBUNTU_DESCRIPTION}" == "18.04" ]]; then
-                DISTRO=18
-            elif [[ "${UBUNTU_DESCRIPTION}" == "16.04" ]]; then
-                DISTRO=16
-            else
-                DISTRO=22  # Default to Ubuntu 22.04 if unknown version
-            fi
-        else
-            # Debian detection
-            DEBIAN_DESCRIPTION=$(cat /etc/debian_version 2>/dev/null | cut -d. -f1)
-            if [[ "${DEBIAN_DESCRIPTION}" == "12" ]]; then
-                DISTRO=12
-            elif [[ "${DEBIAN_DESCRIPTION}" == "11" ]]; then
-                DISTRO=11
-            else
-                DISTRO=12  # Default to Debian 12 if unknown version
-            fi
-        fi
-    fi
-
-    # Set default values for other variables that might be unbound
-    if [ -z "${PUBLIC_IP:-}" ]; then
-        PUBLIC_IP=""
-    fi
-    if [ -z "${PUBLIC_IPV6:-}" ]; then
-        PUBLIC_IPV6=""
-    fi
-    if [ -z "${PRIVATE_IP:-}" ]; then
-        PRIVATE_IP=""
-    fi
-
     # Create the STORAGE_USER and STORAGE_ROOT directory if they don't already exist.
     if ! id -u $STORAGE_USER >/dev/null 2>&1; then
         sudo useradd -m $STORAGE_USER
@@ -183,19 +116,19 @@ if [[ ("$UsingSSH" == "yes") ]]; then
     PUBLIC_IP='"${PUBLIC_IP}"'
     PUBLIC_IPV6='"${PUBLIC_IPV6}"'
     DISTRO='"${DISTRO}"'
-    PRIVATE_IP='"${PRIVATE_IP:-$PUBLIC_IP}"'' | sudo -E tee /etc/yiimpool.conf >/dev/null 2>&1
+    PRIVATE_IP='"${PRIVATE_IP}"'' | sudo -E tee /etc/yiimpool.conf >/dev/null 2>&1
 
     # Set Donor Addresses
-    echo 'BTCDON="3ELCjkScgaJbnqQiQvXb7Mwos1Y2x7hBFK"
-    LTCDON="M8uerJZUgBn9KbTn8ng9MasM9nWFgsGftW"
+    echo 'BTCDON="bc1qc4qqz8eu5j7u8pxfrfvv8nmcka7whhm225a3f9"
+    LTCDON="MC9xjhE7kmeBFMs4UmfAQyWuP99M49sCQp"
     ETHDON="0xdA929d4f03e1009Fc031210DDE03bC40ea66D044"
     BCHDON="qpse55j0kg0txz0zyx8nsrv3pvd039c09ypplsfn87"
-    DOGEDON="DKBddo8Qoh19PCFtopBkwTpcEU1aAqdM7S"' | sudo -E tee /etc/yiimpooldonate.conf >/dev/null 2>&1
+    DOGEDON="DHNhm8FqNAQ1VTNwmCHAp3wfQ6PcfzN1nu"' | sudo -E tee /etc/yiimpooldonate.conf >/dev/null 2>&1
 
     sudo cp -r ~/Yiimpoolv1 /home/${yiimpadmin}/
     cd ~
     sudo setfacl -m u:${yiimpadmin}:rwx /home/${yiimpadmin}/Yiimpoolv1
-    sudo rm -rf "$HOME/Yiimpoolv1"
+    sudo rm -r $HOME/yiimpool
     clear
     term_art
     echo
@@ -218,7 +151,7 @@ fi
 # New User Password Login Creation
 if [ -z "${yiimpadmin:-}" ]; then
     DEFAULT_yiimpadmin=yiimpadmin
-    input_box "Create New Username" \
+    input_box "Creaete new username" \
         "Please enter your new username.
   \n\nUser Name:" \
         ${DEFAULT_yiimpadmin} \
@@ -233,8 +166,8 @@ fi
 if [ -z "${RootPassword:-}" ]; then
     DEFAULT_RootPassword=$(openssl rand -base64 8 | tr -d "=+/")
     input_box "User Password" \
-        "Enter your new user password or use this randomly system-generated one.
-  \n\nUnfortunately, dialog doesn't let you copy. So you have to write it down.
+        "Enter your new user password or use this randomly system generated one.
+  \n\nUnfortunatley dialog doesnt let you copy. So you have to write it down.
   \n\nUser password:" \
         ${DEFAULT_RootPassword} \
         RootPassword
@@ -247,18 +180,16 @@ fi
 
 clear
 
-set +e
-dialog --title "Verify Your Input" \
+dialog --title "Verify Your input" \
     --yesno "Please verify your answers before you continue:
 New User Name : ${yiimpadmin}
-New User Pass : ${RootPassword}" 8 60 2>/dev/null
+New User Pass : ${RootPassword}" 8 60
 
 # Get exit status
 # 0 means user hit [yes] button.
 # 1 means user hit [no] button.
 # 255 means user hit [Esc] key.
 response=$?
-set -e
 case $response in
 
 0)
@@ -285,66 +216,6 @@ case $response in
     cd $HOME/Yiimpoolv1/install
     source pre_setup.sh
 
-    # Set STORAGE_USER and STORAGE_ROOT to default values if not already set
-    if [ -z "${STORAGE_USER:-}" ]; then
-        STORAGE_USER=${DEFAULT_STORAGE_USER:-"crypto-data"}
-    fi
-    if [ -z "${STORAGE_ROOT:-}" ]; then
-        STORAGE_ROOT=${DEFAULT_STORAGE_ROOT:-"/home/$STORAGE_USER"}
-    fi
-
-    # Detect OS and set DISTRO if not already set
-    if [ -z "${DISTRO:-}" ]; then
-        if [[ -f /etc/rpi-issue ]]; then
-            # Raspberry Pi OS detection
-            RASBERRY_PI_DESCRIPTION=$(lsb_release -rs 2>/dev/null || cat /etc/debian_version | cut -d. -f1)
-            if [[ "${RASBERRY_PI_DESCRIPTION}" == "13" ]] || [[ "${RASBERRY_PI_DESCRIPTION}" == "12" ]] || [[ "${RASBERRY_PI_DESCRIPTION}" == "11" ]]; then
-                DISTRO=13
-            else
-                DISTRO=13  # Default to 13 for Raspberry Pi if unknown version
-            fi
-        elif [[ -f /etc/lsb-release ]]; then
-            # Ubuntu detection
-            UBUNTU_DESCRIPTION=$(lsb_release -rs)
-            if [[ "${UBUNTU_DESCRIPTION}" == "24.04" ]]; then
-                DISTRO=24
-            elif [[ "${UBUNTU_DESCRIPTION}" == "23.04" ]]; then
-                DISTRO=23
-            elif [[ "${UBUNTU_DESCRIPTION}" == "22.04" ]]; then
-                DISTRO=22
-            elif [[ "${UBUNTU_DESCRIPTION}" == "20.04" ]]; then
-                DISTRO=20
-            elif [[ "${UBUNTU_DESCRIPTION}" == "18.04" ]]; then
-                DISTRO=18
-            elif [[ "${UBUNTU_DESCRIPTION}" == "16.04" ]]; then
-                DISTRO=16
-            else
-                DISTRO=22  # Default to Ubuntu 22.04 if unknown version
-            fi
-        else
-            # Debian detection
-            DEBIAN_DESCRIPTION=$(cat /etc/debian_version 2>/dev/null | cut -d. -f1)
-            if [[ "${DEBIAN_DESCRIPTION}" == "12" ]]; then
-                DISTRO=12
-            elif [[ "${DEBIAN_DESCRIPTION}" == "11" ]]; then
-                DISTRO=11
-            else
-                DISTRO=12  # Default to Debian 12 if unknown version
-            fi
-        fi
-    fi
-
-    # Set default values for other variables that might be unbound
-    if [ -z "${PUBLIC_IP:-}" ]; then
-        PUBLIC_IP=""
-    fi
-    if [ -z "${PUBLIC_IPV6:-}" ]; then
-        PUBLIC_IPV6=""
-    fi
-    if [ -z "${PRIVATE_IP:-}" ]; then
-        PRIVATE_IP=""
-    fi
-
     # Create the STORAGE_USER and STORAGE_ROOT directory if they don't already exist.
     if ! id -u $STORAGE_USER >/dev/null 2>&1; then
         sudo useradd -m $STORAGE_USER
@@ -361,7 +232,7 @@ case $response in
     PUBLIC_IPV6='"${PUBLIC_IPV6}"'
     DISTRO='"${DISTRO}"'
 
-    PRIVATE_IP='"${PRIVATE_IP:-$PUBLIC_IP}"'' | sudo -E tee /etc/yiimpool.conf >/dev/null 2>&1
+    PRIVATE_IP='"${PRIVATE_IP}"'' | sudo -E tee /etc/yiimpool.conf >/dev/null 2>&1
 
     # Set Donor Addresses
     echo 'BTCDON="3ELCjkScgaJbnqQiQvXb7Mwos1Y2x7hBFK"
@@ -373,7 +244,7 @@ case $response in
     sudo cp -r ~/Yiimpoolv1 /home/${yiimpadmin}/
     cd ~
     sudo setfacl -m u:${yiimpadmin}:rwx /home/${yiimpadmin}/Yiimpoolv1
-    sudo rm -rf "$HOME/Yiimpoolv1"
+    sudo rm -r $HOME/Yiimpoolv1
     clear
     term_art
     echo
