@@ -21,12 +21,6 @@ This installer provides an automated way to set up a full Yiimp mining pool on U
 - Comprehensive screen management for monitoring
 - PhpMyAdmin for database management
 
-### What’s new
-- Hardened installer (strict mode, unified error handling, resilient preflight)
-- Correct MariaDB repository configuration
-- Admin URL standardized to `/admin/login`
-- Branded MOTD with version; default Ubuntu MOTD snippets disabled
-- Post-install verification script
 
 ## System Requirements
 
