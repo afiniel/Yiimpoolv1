@@ -129,9 +129,9 @@ Built-in coin daemon compiler accessible via the `daemonbuilder` command. Featur
 
 For assistance:
 - Open an issue on GitHub
-- Join our Discord server
+- Join our Discord server: https://discord.gg/vV3JvN5JFm
 
-## Donation wallets if you want to support me Thank you
+## Donation wallets if you want to support Thank you
 
 Donations appreciated:
 
