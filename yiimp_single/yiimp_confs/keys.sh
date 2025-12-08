@@ -46,8 +46,11 @@ define('"'"'EXCH_TRADEOGRE_SECRET'"'"', '"'"''"'"');
 define('"'"'EXCH_YOBIT_KEY'"'"', '"'"''"'"');
 define('"'"'EXCH_YOBIT_SECRET'"'"', '"'"''"'"');
 
-define('"'"'EXCH_XEGGEX_KEY'"'"', '"'"''"'"');
-define('"'"'EXCH_XEGGEX_SECRET'"'"', '"'"''"'"');
+define('"'"'EXCH_NONKYC_KEY'"'"', '"'"''"'"');
+define('"'"'EXCH_NONKYC_SECRET'"'"', '"'"''"'"');
+
+// Automatic withdraw to Yaamp btc wallet if btc balance > 0.3
+define('"'"'EXCH_AUTO_WITHDRAW'"'"', 0.3);
 
 ' | sudo -E tee $STORAGE_ROOT/yiimp/site/configuration/keys.php >/dev/null 2>&1
 cd $HOME/Yiimpoolv1/yiimp_single

@@ -1,35 +1,71 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
+// Register Bootstrap 5 and other required assets
+Yii::app()->clientScript->registerCssFile('https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css');
+Yii::app()->clientScript->registerScriptFile('https://code.jquery.com/jquery-3.6.0.min.js', CClientScript::POS_HEAD);
+Yii::app()->clientScript->registerScriptFile('https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js', CClientScript::POS_END);
+
+// Add custom styles
+echo <<<EOT
+<style type="text/css">
+.container { max-width: 1200px; margin: 20px auto; }
+.form-group { margin-bottom: 1rem; }
+.form-hint { color: #666; font-size: 0.875rem; margin-top: 0.25rem; }
+[readonly] { background-color: #e9ecef; }
+.nav-tabs { margin-bottom: 20px; border-bottom: 1px solid #dee2e6; }
+.nav-tabs .nav-link { color: #495057; }
+.nav-tabs .nav-link.active { color: #007bff; border-color: #dee2e6 #dee2e6 #fff; }
+.tab-content { padding: 20px 0; }
+.btn-primary { margin-top: 20px; }
+.form-control { max-width: 100%; }
+.form-check-input { margin-top: 0.3rem; }
+</style>
+EOT;
+
+echo '<div class="container">';
 echo getAdminSideBarLinks();
-if (!is_null($coin->id))
-	echo " - <a href='/admin/coin?id={$coin->id}'>{$coin->name}</a><br/>";
-else
-	echo " - new coin";
+
+if (!isset($coin)) {
+    echo '<div class="alert alert-danger">Error: Coin object not initialized</div>';
+    return;
+}
+
+if (!is_null($coin->id)) {
+    echo '<h2>Edit Coin: ' . CHtml::link($coin->name, '/admin/coin?id='.$coin->id) . '</h2>';
+} else {
+    echo '<h2>Create New Coin</h2>';
+}
 
 $this->widget('UniForm');
 
-echo CUFHtml::beginForm();
-echo CUFHtml::errorSummary($coin);
-echo CUFHtml::openTag('fieldset', array('class'=>'inlineLabels'));
+echo CUFHtml::beginForm('', 'post', array('class'=>'form'));
+echo CUFHtml::errorSummary($coin, '', '', array('class'=>'alert alert-danger'));
 
-InitMenuTabs('#tabs');
+// Replace the existing tabs HTML with Bootstrap tabs
+echo <<<EOT
+<ul class="nav nav-tabs" id="coinTabs" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" id="general-tab" data-bs-toggle="tab" href="#tabs-1" role="tab">General</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="settings-tab" data-bs-toggle="tab" href="#tabs-2" role="tab">Settings</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="exchange-tab" data-bs-toggle="tab" href="#tabs-3" role="tab">Exchange</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="daemon-tab" data-bs-toggle="tab" href="#tabs-4" role="tab">Daemon</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="links-tab" data-bs-toggle="tab" href="#tabs-5" role="tab">Links</a>
+    </li>
+</ul>
+<div class="tab-content" id="coinTabsContent">
+EOT;
 
-echo <<<end
-<style type="text/css">
-[readonly~=readonly] {
-	color: gray;
-}
-</style>
-<div id="tabs"><ul>
-<li><a href="#tabs-1">General</a></li>
-<li><a href="#tabs-2">Settings</a></li>
-<li><a href="#tabs-3">Exchange</a></li>
-<li><a href="#tabs-4">Daemon</a></li>
-<li><a href="#tabs-5">Links</a></li>
-</ul><br>
-end;
-
-echo '<div id="tabs-1">';
+echo '<div class="tab-pane fade show active" id="tabs-1" role="tabpanel">';
 
 echo CUFHtml::openActiveCtrlHolder($coin, 'name');
 echo CUFHtml::activeLabelEx($coin, 'name');
@@ -155,11 +191,11 @@ echo CUFHtml::activeLabelEx($coin, 'specifications');
 echo CUFHtml::activeTextArea($coin, 'specifications', array('maxlength'=>2048,'lines'=>5,'class'=>'tweetnews-input','style'=>'width: 600px;'));
 echo CUFHtml::closeCtrlHolder();
 
-echo "</div>";
+echo '</div>';
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-echo '<div id="tabs-2">';
+echo '<div class="tab-pane fade" id="tabs-2" role="tabpanel">';
 
 echo CUFHtml::openActiveCtrlHolder($coin, 'enable');
 echo CUFHtml::activeLabelEx($coin, 'enable');
@@ -299,11 +335,11 @@ echo CUFHtml::activeCheckBox($coin, 'usemweb');
 echo '<p class="formHint2"></p>';
 echo CUFHtml::closeCtrlHolder();
 
-echo "</div>";
+echo '</div>';
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-echo '<div id="tabs-3">';
+echo '<div class="tab-pane fade" id="tabs-3" role="tabpanel">';
 
 echo CUFHtml::openActiveCtrlHolder($coin, 'dontsell');
 echo CUFHtml::activeLabelEx($coin, 'dontsell');
@@ -361,7 +397,7 @@ echo '</div>';
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-echo '<div id="tabs-4">';
+echo '<div class="tab-pane fade" id="tabs-4" role="tabpanel">';
 
 echo CUFHtml::openActiveCtrlHolder($coin, 'program');
 echo CUFHtml::activeLabelEx($coin, 'program');
@@ -499,12 +535,12 @@ if ($coin->id) {
 	echo CHtml::closetag("pre");
 }
 
-echo "</div>";
+echo '</div>';
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-echo '<div id="tabs-5">';
+echo '<div class="tab-pane fade" id="tabs-5" role="tabpanel">';
 
 echo CUFHtml::openActiveCtrlHolder($coin, 'link_bitcointalk');
 echo CUFHtml::activeLabelEx($coin, 'link_bitcointalk');
@@ -554,11 +590,31 @@ echo CUFHtml::activeTextField($coin, 'link_facebook');
 echo "<p class='formHint2'></p>";
 echo CUFHtml::closeCtrlHolder();
 
-echo "</div>";
+echo '</div>';
 
 
-echo "</div>";
+echo '</div>';
 
 echo CUFHtml::closeTag('fieldset');
 showSubmitButton($update? 'Save': 'Create');
 echo CUFHtml::endForm();
+
+Yii::app()->clientScript->registerScript('init-tabs', "
+jQuery(document).ready(function($) {
+    // Get active tab from URL hash or default to first tab
+    let hash = window.location.hash;
+    if (hash) {
+        $('#coinTabs a[href=\"'+hash+'\"]').tab('show');
+    }
+
+    // Update URL hash when tab changes
+    $('#coinTabs a').on('click', function (e) {
+        e.preventDefault();
+        $(this).tab('show');
+        window.location.hash = $(this).attr('href');
+    });
+});
+", CClientScript::POS_END);
+?>
+
+

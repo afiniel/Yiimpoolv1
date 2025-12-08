@@ -14,59 +14,57 @@ if [[ ("$wireguard" == "false") ]]; then
 	echo '<?php
 
 ini_set('"'"'date.timezone'"'"', '"'"'UTC'"'"');
-define('"'"'YAAMP_LOGS'"'"', '"'"''"${STORAGE_ROOT}/yiimp/site/log"''"'"');
-define('"'"'YAAMP_HTDOCS'"'"', '"'"''"${STORAGE_ROOT}/yiimp/site/web"''"'"');
-define('"'"'YAAMP_BIN'"'"', '"'"'/bin'"'"');
+define('"'"'YIIMP_LOGS'"'"', '"'"''"${STORAGE_ROOT}/yiimp/site/log"''"'"');
+define('"'"'YIIMP_HTDOCS'"'"', '"'"''"${STORAGE_ROOT}/yiimp/site/web"''"'"');
+define('"'"'YIIMP_BIN'"'"', '"'"'/bin'"'"');
 
-define('"'"'YAAMP_DBHOST'"'"', '"'"''"localhost"''"'"');
-define('"'"'YAAMP_DBNAME'"'"', '"'"''"${YiiMPDBName}"''"'"');
-define('"'"'YAAMP_DBUSER'"'"', '"'"''"${YiiMPPanelName}"''"'"');
-define('"'"'YAAMP_DBPASSWORD'"'"', '"'"''"${PanelUserDBPassword}"''"'"');
+define('"'"'YIIMP_DBHOST'"'"', '"'"''"localhost"''"'"');
+define('"'"'YIIMP_DBNAME'"'"', '"'"''"${YiiMPDBName}"''"'"');
+define('"'"'YIIMP_DBUSER'"'"', '"'"''"${YiiMPPanelName}"''"'"');
+define('"'"'YIIMP_DBPASSWORD'"'"', '"'"''"${PanelUserDBPassword}"''"'"');
 
-define('"'"'YAAMP_PRODUCTION'"'"', true);
-define('"'"'YAAMP_RENTAL'"'"', false); // set to true to enable rental system
+define('"'"'YIIMP_PRODUCTION'"'"', true);
+define('"'"'YIIMP_RENTAL'"'"', false); // set to true to enable rental system
 
-define('"'"'YAAMP_LIMIT_ESTIMATE'"'"', false);
+define('"'"'YIIMP_LIMIT_ESTIMATE'"'"', false);
 
 define('"'"'YIIMP_FIAT_ALTERNATIVE'"'"', '"'"'USD'"'"'); // USD is main
-define('"'"'YAAMP_FEES_SOLO'"'"', 0.5); // Set Pool Fee (solo)
-define('"'"'YAAMP_FEES_MINING'"'"', 0.5); // Set Pool Fee (non solo)
-define('"'"'YAAMP_FEES_EXCHANGE'"'"', 2); // Set Exchange Fee
-define('"'"'YAAMP_FEES_RENTING'"'"', 2); // Set Renting Fee
+define('"'"'YIIMP_FEES_SOLO'"'"', 0.5); // Set Pool Fee (solo)
+define('"'"'YIIMP_FEES_MINING'"'"', 0.5); // Set Pool Fee (non solo)
+define('"'"'YIIMP_FEES_EXCHANGE'"'"', 2); // Set Exchange Fee
+define('"'"'YIIMP_FEES_RENTING'"'"', 2); // Set Renting Fee
+define('"'"'YIIMP_TXFEE_RENTING_WD'"'"', 0.002); // Set Transaction Fee for Renting Withdraw
 
-define('"'"'YAAMP_TXFEE_RENTING_WD'"'"', 0.002);
-define('"'"'YAAMP_PAYMENTS_FREQ'"'"', 1*60*60); // set how often the pool will pay miners
-define('"'"'YAAMP_PAYMENTS_MINI'"'"', 0.001); // set minimum payment for miners
+define('"'"'YIIMP_TXFEE_RENTING_WD'"'"', 0.002);
+define('"'"'YIIMP_PAYMENTS_FREQ'"'"', 1*60*60); // set how often the pool will pay miners
+define('"'"'YIIMP_PAYMENTS_MINI'"'"', 0.001); // set minimum payment for miners
 
-define('"'"'YAAMP_ALLOW_EXCHANGE'"'"', false); // allow to exchange coins directly from site wallet
+define('"'"'YIIMP_ALLOW_EXCHANGE'"'"', false); // allow to exchange coins directly from site wallet
 define('"'"'YIIMP_PUBLIC_EXPLORER'"'"', false); // allow public view of site block explorer
 define('"'"'YIIMP_PUBLIC_BENCHMARK'"'"', false); // allow public view of site benchmark page
 
 
 define('"'"'YAAMP_BTCADDRESS'"'"', '"'"'bc1qpnxtg3dvtglrvfllfk3gslt6h5zffkf069nh8r'"'"');
 
-define('"'"'YAAMP_SITE_URL'"'"', '"'"''"${DomainName}"''"'"');
-define('"'"'YAAMP_STRATUM_URL'"'"', '"'"''"${StratumURL}"''"'"'); // change if your stratum server is on a different host
-define('"'"'YAAMP_SITE_NAME'"'"', '"'"''"${DomainName}"''"'"'); // Change to your website name.
+define('"'"'YIIMP_SITE_URL'"'"', '"'"''"${DomainName}"''"'"');
+define('"'"'YIIMP_STRATUM_URL'"'"', '"'"''"${StratumURL}"''"'"'); // change if your stratum server is on a different host
+define('"'"'YIIMP_SITE_NAME'"'"', '"'"''"${DomainName}"''"'"'); // Change to your website name.
 
-define('"'"'YAAMP_ADMIN_EMAIL'"'"', '"'"''"${SupportEmail}"''"'"');
-define('"'"'YAAMP_ADMIN_IP'"'"', '"'"''"${PublicIP}"''"'"'); // samples: "80.236.118.26,90.234.221.11" or "10.0.0.1/8"
-define('"'"'YAAMP_ADMIN_USER'"'"', '"'"''"${AdminUser}"''"'"'); // Set Admin User Name
-define('"'"'YAAMP_ADMIN_PASS'"'"', '"'"''"${AdminPassword}"''"'"'); // Set Admin User Password
+define('"'"'YIIMP_ADMIN_EMAIL'"'"', '"'"''"${SupportEmail}"''"'"');
+define('"'"'YIIMP_ADMIN_IP'"'"', '"'"''"${PublicIP}"''"'"'); // samples: "80.236.118.26,90.234.221.11" or "10.0.0.1/8"
+define('"'"'YIIMP_ADMIN_USER'"'"', '"'"''"${AdminUser}"''"'"'); // Set Admin User Name
+define('"'"'YIIMP_ADMIN_PASS'"'"', '"'"''"${AdminPassword}"''"'"'); // Set Admin User Password
 
 define('"'"'YIIMP_ADMIN_LOGIN'"'"', true);
-define('"'"'YAAMP_ADMIN_WEBCONSOLE'"'"', true);
-define('"'"'YAAMP_CREATE_NEW_COINS'"'"', true);
-define('"'"'YAAMP_NOTIFY_NEW_COINS'"'"', false);
+define('"'"'YIIMP_ADMIN_WEBCONSOLE'"'"', true);
+define('"'"'YIIMP_CREATE_NEW_COINS'"'"', true);
+define('"'"'YIIMP_NOTIFY_NEW_COINS'"'"', false);
 
-define('"'"'YAAMP_DEFAULT_ALGO'"'"', '"'"'x11'"'"');
-define('"'"'YAAMP_USE_NGINX'"'"', true);
+define('"'"'YIIMP_DEFAULT_ALGO'"'"', '"'"'x11'"'"');
+define('"'"'YIIMP_USE_NGINX'"'"', true);
 
 // Exchange public keys (private keys are in a separate config file)
 
-
-// Automatic withdraw to Yaamp btc wallet if btc balance > 0.3
-define('"'"'EXCH_AUTO_WITHDRAW'"'"', 0.3);
 
 define('"'"'YAAMP_USE_NICEHASH_API'"'"', false);
 // nicehash keys deposit account & amount to deposit at a time
@@ -103,58 +101,55 @@ else
 
 	echo '<?php
 ini_set('"'"'date.timezone'"'"', '"'"'UTC'"'"');
-define('"'"'YAAMP_LOGS'"'"', '"'"''"${STORAGE_ROOT}/yiimp/site/log"''"'"');
-define('"'"'YAAMP_HTDOCS'"'"', '"'"''"${STORAGE_ROOT}/yiimp/site/web"''"'"');
-define('"'"'YAAMP_BIN'"'"', '"'"'/bin'"'"');
-define('"'"'YAAMP_DBHOST'"'"', '"'"''"${DBInternalIP}"''"'"');
-define('"'"'YAAMP_DBNAME'"'"', '"'"''"${YiiMPDBName}"''"'"');
-define('"'"'YAAMP_DBUSER'"'"', '"'"''"${YiiMPPanelName}"''"'"');
-define('"'"'YAAMP_DBPASSWORD'"'"', '"'"''"${PanelUserDBPassword}"''"'"');
+define('"'"'YIIMP_LOGS'"'"', '"'"''"${STORAGE_ROOT}/yiimp/site/log"''"'"');
+define('"'"'YIIMP_HTDOCS'"'"', '"'"''"${STORAGE_ROOT}/yiimp/site/web"''"'"');
+define('"'"'YIIMP_BIN'"'"', '"'"'/bin'"'"');
+define('"'"'YIIMP_DBHOST'"'"', '"'"''"${DBInternalIP}"''"'"');
+define('"'"'YIIMP_DBNAME'"'"', '"'"''"${YiiMPDBName}"''"'"');
+define('"'"'YIIMP_DBUSER'"'"', '"'"''"${YiiMPPanelName}"''"'"');
+define('"'"'YIIMP_DBPASSWORD'"'"', '"'"''"${PanelUserDBPassword}"''"'"');
 
-define('"'"'YAAMP_PRODUCTION'"'"', true);
-define('"'"'YAAMP_RENTAL'"'"', false); // set to true to enable rental system
+define('"'"'YIIMP_PRODUCTION'"'"', true);
+define('"'"'YIIMP_RENTAL'"'"', false); // set to true to enable rental system
 
-define('"'"'YAAMP_LIMIT_ESTIMATE'"'"', false);
+define('"'"'YIIMP_LIMIT_ESTIMATE'"'"', false);
 
 define('"'"'YIIMP_FIAT_ALTERNATIVE'"'"', '"'"'USD'"'"'); // USD is main
-define('"'"'YAAMP_FEES_SOLO'"'"', 0.5); // Set Pool Fee (solo)
-define('"'"'YAAMP_FEES_MINING'"'"', 0.5); // Set Pool Fee (non solo)
-define('"'"'YAAMP_FEES_EXCHANGE'"'"', 2); // Set Exchange Fee
-define('"'"'YAAMP_FEES_RENTING'"'"', 2); // Set Renting Fee
+define('"'"'YIIMP_FEES_SOLO'"'"', 0.5); // Set Pool Fee (solo)
+define('"'"'YIIMP_FEES_MINING'"'"', 0.5); // Set Pool Fee (non solo)
+define('"'"'YIIMP_FEES_EXCHANGE'"'"', 2); // Set Exchange Fee
+define('"'"'YIIMP_FEES_RENTING'"'"', 2); // Set Renting Fee
 
-define('"'"'YAAMP_TXFEE_RENTING_WD'"'"', 0.002);
-define('"'"'YAAMP_PAYMENTS_FREQ'"'"', 1*60*60); // set how often the pool will pay miners
-define('"'"'YAAMP_PAYMENTS_MINI'"'"', 0.001); // set minimum payment for miners
+define('"'"'YIIMP_TXFEE_RENTING_WD'"'"', 0.002);
+define('"'"'YIIMP_PAYMENTS_FREQ'"'"', 1*60*60); // set how often the pool will pay miners
+define('"'"'YIIMP_PAYMENTS_MINI'"'"', 0.001); // set minimum payment for miners
 
-define('"'"'YAAMP_ALLOW_EXCHANGE'"'"', false); // allow to exchange coins directly from site wallet
+define('"'"'YIIMP_ALLOW_EXCHANGE'"'"', false); // allow to exchange coins directly from site wallet
 define('"'"'YIIMP_PUBLIC_EXPLORER'"'"', false); // allow public view of site block explorer
 define('"'"'YIIMP_PUBLIC_BENCHMARK'"'"', false); // allow public view of site benchmark page
 
 
-define('"'"'YAAMP_BTCADDRESS'"'"', '"'"'bc1qpnxtg3dvtglrvfllfk3gslt6h5zffkf069nh8r'"'"');
+define('"'"'YIIMP_BTCADDRESS'"'"', '"'"'bc1qpnxtg3dvtglrvfllfk3gslt6h5zffkf069nh8r'"'"');
 
-define('"'"'YAAMP_SITE_URL'"'"', '"'"''"${DomainName}"''"'"');
-define('"'"'YAAMP_STRATUM_URL'"'"', '"'"''"${StratumURL}"''"'"'); // change if your stratum server is on a different host
-define('"'"'YAAMP_SITE_NAME'"'"', '"'"''"${DomainName}"''"'"'); // Change to your website name.
+define('"'"'YIIMP_SITE_URL'"'"', '"'"''"${DomainName}"''"'"');
+define('"'"'YIIMP_STRATUM_URL'"'"', '"'"''"${StratumURL}"''"'"'); // change if your stratum server is on a different host
+define('"'"'YIIMP_SITE_NAME'"'"', '"'"''"${DomainName}"''"'"'); // Change to your website name.
 
-define('"'"'YAAMP_ADMIN_EMAIL'"'"', '"'"''"${SupportEmail}"''"'"');
-define('"'"'YAAMP_ADMIN_IP'"'"', '"'"''"${PublicIP}"''"'"'); // samples: "80.236.118.26,90.234.221.11" or "10.0.0.1/8"
-define('"'"'YAAMP_ADMIN_USER'"'"', '"'"''"${AdminUser}"''"'"'); // Set Admin User Name
-define('"'"'YAAMP_ADMIN_PASS'"'"', '"'"''"${AdminPassword}"''"'"'); // Set Admin User Password
+define('"'"'YIIMP_ADMIN_EMAIL'"'"', '"'"''"${SupportEmail}"''"'"');
+define('"'"'YIIMP_ADMIN_IP'"'"', '"'"''"${PublicIP}"''"'"'); // samples: "80.236.118.26,90.234.221.11" or "10.0.0.1/8"
+define('"'"'YIIMP_ADMIN_USER'"'"', '"'"''"${AdminUser}"''"'"'); // Set Admin User Name
+define('"'"'YIIMP_ADMIN_PASS'"'"', '"'"''"${AdminPassword}"''"'"'); // Set Admin User Password
 
 define('"'"'YIIMP_ADMIN_LOGIN'"'"', true);
-define('"'"'YAAMP_ADMIN_WEBCONSOLE'"'"', true);
-define('"'"'YAAMP_CREATE_NEW_COINS'"'"', true);
-define('"'"'YAAMP_NOTIFY_NEW_COINS'"'"', false);
+define('"'"'YIIMP_ADMIN_WEBCONSOLE'"'"', true);
+define('"'"'YIIMP_CREATE_NEW_COINS'"'"', true);
+define('"'"'YIIMP_NOTIFY_NEW_COINS'"'"', false);
 
-define('"'"'YAAMP_DEFAULT_ALGO'"'"', '"'"'x11'"'"');
-define('"'"'YAAMP_USE_NGINX'"'"', true);
+define('"'"'YIIMP_DEFAULT_ALGO'"'"', '"'"'x11'"'"');
+define('"'"'YIIMP_USE_NGINX'"'"', true);
 
 // Exchange public keys (private keys are in a separate config file)
 
-
-// Automatic withdraw to Yaamp btc wallet if btc balance > 0.3
-define('"'"'EXCH_AUTO_WITHDRAW'"'"', 0.3);
 
 define('"'"'YAAMP_USE_NICEHASH_API'"'"', false);
 // nicehash keys deposit account & amount to deposit at a time
