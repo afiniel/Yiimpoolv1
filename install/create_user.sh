@@ -235,11 +235,11 @@ case $response in
     PRIVATE_IP='"${PRIVATE_IP}"'' | sudo -E tee /etc/yiimpool.conf >/dev/null 2>&1
 
     # Set Donor Addresses
-    echo 'BTCDON="3ELCjkScgaJbnqQiQvXb7Mwos1Y2x7hBFK"
-    LTCDON="M8uerJZUgBn9KbTn8ng9MasM9nWFgsGftW"
+    echo 'BTCDON="bc1qc4qqz8eu5j7u8pxfrfvv8nmcka7whhm225a3f9"
+    LTCDON="MC9xjhE7kmeBFMs4UmfAQyWuP99M49sCQp"
     ETHDON="0xdA929d4f03e1009Fc031210DDE03bC40ea66D044"
     BCHDON="qpse55j0kg0txz0zyx8nsrv3pvd039c09ypplsfn87"
-    DOGEDON="DKBddo8Qoh19PCFtopBkwTpcEU1aAqdM7S"' | sudo -E tee /etc/yiimpooldonate.conf >/dev/null 2>&1
+    DOGEDON="DHNhm8FqNAQ1VTNwmCHAp3wfQ6PcfzN1nu"' | sudo -E tee /etc/yiimpooldonate.conf >/dev/null 2>&1
 
     sudo cp -r ~/Yiimpoolv1 /home/${yiimpadmin}/
     cd ~
