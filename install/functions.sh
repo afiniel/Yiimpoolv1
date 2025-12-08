@@ -47,45 +47,39 @@ function install_end_message() {
   BOLD_CYAN='\033[1;36m'
   NC='\033[0m'  # Reset color
 
-  echo "YiiMP installation complete!"
+  echo "Yiimp Installation Complete!"
   echo
 
   figlet -f slant -w 100 "Success"
 
-  echo -e "${GREEN}Yiimp Version:${NC} $VERSION"
+  echo -e "${BOLD_GREEN}**Yiimp Version:**${NC} $VERSION"
   echo
 
-  echo -e "${BOLD_CYAN}Database Information:${NC}"
-  echo "  - MariaDB client credentials saved in ~/.my.cnf"
+  echo -e "${BOLD_CYAN}**Database Information:**${NC}"
+  echo "  - Login credentials are saved securely in ~/.my.cnf"
   echo
 
-  # Determine protocol and hostname for links
-  local proto="http"
-  if [[ "${InstallSSL,,}" == "yes" ]]; then proto="https"; fi
-  local host="${DomainName:-${PRIMARY_HOSTNAME:-$server_name}}"
-
-  echo -e "${BOLD_CYAN}Access URLs:${NC}"
-  echo "  - Pool:        ${proto}://${host}"
-  echo "  - Admin:       ${proto}://${host}/admin/login"
-  echo "  - phpMyAdmin:  ${proto}://${host}/phpmyadmin"
+  echo -e "${BOLD_CYAN}**Pool and Admin Panel Access:**${NC}"
+  echo "  - Pool: http://$server_name"
+  echo "  - Admin Panel: http://$server_name/site/AdminPanel"
+  echo "  - phpMyAdmin: http://$server_name/phpmyadmin"
   echo
 
-  echo -e "${BOLD_CYAN}Customization:${NC}"
-  echo "  - To change the admin panel URL (currently '$admin_panel'):"
+  echo -e "${BOLD_CYAN}**Customization:**${NC}"
+  echo "  - To modify the admin panel URL (currently set to '$admin_panel'):"
   echo "    - Edit ${BOLD_YELLOW}/var/web/yaamp/modules/site/SiteController.php${NC}"
   echo "    - Update line 11 with your desired URL"
   echo
 
-  echo -e "${BOLD_CYAN}Security Reminders:${NC}"
+  echo -e "${BOLD_CYAN}**Security Reminders:**${NC}"
   echo "  - Update public keys and wallet addresses in ${BOLD_YELLOW}/var/web/serverconfig.php${NC}"
   echo "  - Replace placeholder private keys in ${BOLD_YELLOW}/etc/yiimp/keys.php${NC} with your actual keys"
   echo "    - ${RED}Never share your private keys with anyone!${NC}"
   echo
 
-  echo -e "${BOLD_YELLOW}Next Steps:${NC}"
-  echo "  1. Reboot your server to finalize the installation: ${RED}reboot${NC}"
-  echo "  2. After reboot, run: ${BOLD_YELLOW}screen -r debug${NC} to view startup logs"
-  echo "  3. Secure your installation following server hardening best practices"
+  echo -e "${BOLD_YELLOW}**Next Steps:**${NC}"
+  echo "  1. Reboot your server to finalize the installation process. ( ${RED}reboot${NC} )"
+  echo "  2. Secure your installation by following best practices for server security."
   echo
 
   echo "Thank you for using the Yiimp Installer Script Fork by Afiniel!"
@@ -143,9 +137,9 @@ function term_art() {
   echo
   echo -e "${BOLD_CYAN}This script will install:${NC}"
   echo
-  echo -e "  ${GREEN}•${NC} MariaDB for database management"
-  echo -e "  ${GREEN}•${NC} Nginx web server"
-  echo -e "  ${GREEN}•${NC} PHP (and required extensions) for Yiimp"
+  echo -e "  ${GREEN}•${NC} MySQL for database management"
+  echo -e "  ${GREEN}•${NC} Nginx web server with PHP for Yiimp operation"
+  echo -e "  ${GREEN}•${NC} MariaDB as the database backend"
   echo
   echo -e "${BOLD_CYAN}Version:${NC} ${GREEN}${VERSION:-"unknown"}${NC}"
   echo
@@ -235,17 +229,23 @@ function hide_output {
 function last_words {
 	echo "<-------------------------------------|---------------------------------------->"
 	echo
-	echo -e "$YELLOW Thank you for using the Yiimpool Installer $GREEN $VERSION ${NC}"
+	echo -e "$YELLOW Thank you for using the Yiimpool Installer $GREEN $VERSION             ${NC}"
 	echo
-	echo -e "$YELLOW To open the installer menu anytime run: $GREEN yiimpool ${NC}"
-	echo
-	echo -e "$YELLOW If you'd like to support development, donations are appreciated:${NC}"
+	echo -e "$YELLOW To run this installer anytime simply type: $GREEN yiimpool            ${NC}"
+	echo -e "$YELLOW Donations for continued support of this script are welcomed at:       ${NC}"
 	echo "<-------------------------------------|--------------------------------------->"
-	echo -e "$YELLOW BTC :$GREEN $BTCDON ${NC}"
-	echo -e "$YELLOW LTC :$GREEN $LTCDON ${NC}"
-	echo -e "$YELLOW DOGE:$GREEN $DOGEDON ${NC}"
-	echo -e "$YELLOW BCH :$GREEN $BCHDON ${NC}"
-	echo -e "$YELLOW ETH :$GREEN $ETHDON ${NC}"
+	echo -e "$YELLOW                     Donate Wallets:                                   ${NC}"
+	echo "<-------------------------------------|--------------------------------------->"
+	echo -e "$YELLOW Thank you for using Yiimpool Installer $VERSION fork by Afiniel!      ${NC}"
+	echo
+	echo -e "$YELLOW =>  To run this installer anytime simply type:$GREEN yiimpool         ${NC}"
+	echo -e "$YELLOW =>  Do you want to support me? Feel free to use wallets below:        ${NC}"
+	echo "<-------------------------------------|--------------------------------------->"
+	echo -e "$YELLOW =>  BTC:$GREEN $BTCDON                                   		 ${NC}"
+	echo -e "$YELLOW =>  BCH:$GREEN $BCHDON                                   		 ${NC}"
+	echo -e "$YELLOW =>  ETH:$GREEN $ETHDON                                   		 ${NC}"
+	echo -e "$YELLOW =>  DOGE:$GREEN $DOGEDON                                 		 ${NC}"
+	echo -e "$YELLOW =>  LTC:$GREEN $LTCDON                                   		 ${NC}"
 	echo "<-------------------------------------|-------------------------------------->"
 	exit 0
 }
@@ -335,12 +335,7 @@ function restart_service {
 
 ## Dialog Functions ##
 function message_box {
-	# Check if TTY is available before using dialog
-	if [ ! -t 0 ] || [ ! -t 1 ] || [ -z "${TERM:-}" ]; then
-		echo "$2"
-		return 0
-	fi
-	dialog --title "$1" --msgbox "$2" 0 0 2>/dev/null || echo "$2"
+	dialog --title "$1" --msgbox "$2" 0 0
 }
 
 function input_box {
@@ -349,30 +344,8 @@ function input_box {
 	# The exit code from dialog will be stored in VARIABLE_EXITCODE.
 	declare -n result=$4
 	declare -n result_code=$4_EXITCODE
-	
-	# Check if TTY is available before using dialog
-	if [ ! -t 0 ] || [ ! -t 1 ] || [ -z "${TERM:-}" ]; then
-		# No TTY available, use default value or prompt via echo/read
-		result="$3"
-		result_code=0
-		return 0
-	fi
-	
-	# Ensure TERM is set
-	export TERM=${TERM:-xterm}
-
-	# Run dialog and capture its exit status directly (no fallback in the same command)
-	# Use /dev/tty for stderr to ensure proper terminal access
-	result=$(dialog --stdout --title "$1" --inputbox "$2" 0 0 "$3" 2>/dev/tty)
+	result=$(dialog --stdout --title "$1" --inputbox "$2" 0 0 "$3")
 	result_code=$?
-
-	# If dialog failed/canceled or returned an empty string, fall back to default
-	if [ $result_code -ne 0 ] || [ -z "${result}" ]; then
-		result="$3"
-	fi
-	
-	# Always return 0 to prevent script exit on dialog cancellation when set -e is enabled
-	return 0
 }
 
 function input_menu {
@@ -381,28 +354,9 @@ function input_menu {
 	# The exit code from dialog will be stored in VARIABLE_EXITCODE.
 	declare -n result=$4
 	declare -n result_code=$4_EXITCODE
-	
-	# Check if TTY is available before using dialog
-	if [ ! -t 0 ] || [ ! -t 1 ] || [ -z "${TERM:-}" ]; then
-		# No TTY available, use first option as default
-		local IFS=^$'\n'
-		local items=($3)
-		result="${items[0]}"
-		result_code=0
-		return 0
-	fi
-	
-	# Ensure TERM is set
-	export TERM=${TERM:-xterm}
-	
 	local IFS=^$'\n'
-	result=$(dialog --stdout --title "$1" --menu "$2" 0 0 0 $3 2>/dev/null)
+	result=$(dialog --stdout --title "$1" --menu "$2" 0 0 0 $3)
 	result_code=$?
-	if [ $result_code -ne 0 ] || [ -z "${result}" ]; then
-		# Use first option if dialog failed or gave no selection
-		local items=($3)
-		result="${items[0]}"
-	fi
 }
 
 function get_publicip_from_web_service {
@@ -413,10 +367,7 @@ function get_publicip_from_web_service {
 	#
 	# Pass '4' or '6' as an argument to this function to specify
 	# what type of address to get (IPv4, IPv6).
-	# If the lookup fails or times out (e.g. curl exit status 28),
-	# swallow the error so that strict error handling (`set -e` / ERR traps)
-	# in the calling scripts do not abort the whole installer.
-	curl -$1 --fail --silent --max-time 15 icanhazip.com 2>/dev/null || true
+	curl -$1 --fail --silent --max-time 15 icanhazip.com 2>/dev/null
 }
 
 function get_default_privateip {
@@ -613,44 +564,27 @@ BOLD='\033[1m'
 DIM='\033[2m'
 
 print_header() {
-	local msg="${1-}"
-	echo -e "\n${BLUE}${BOLD}=== ${msg} ===${NC}\n"
+    echo -e "\n${BLUE}${BOLD}=== $1 ===${NC}\n"
 }
 
 print_status() {
-	local msg="${1-}"
-	echo -e "${DIM}[${NC}${GREEN}●${NC}${DIM}]${NC} ${msg}"
+    echo -e "${DIM}[${NC}${GREEN}●${NC}${DIM}]${NC} $1"
 }
 
 print_error() {
-	# Be tolerant of zero arguments under set -u (ERR traps may invoke without a message)
-	local msg="${1-}"
-	if [ -z "$msg" ]; then
-		read line file <<<$(caller 0 2>/dev/null || true)
-		if [ -n "${line-}" ] && [ -n "${file-}" ]; then
-			echo "An error occurred in line $line of file $file:" >&2
-			sed "${line}q;d" "$file" >&2 || true
-		else
-			echo -e "${RED}${BOLD}ERROR:${NC} (no message)" >&2
-		fi
-	else
-		echo -e "${RED}${BOLD}ERROR:${NC} $msg"
-	fi
+    echo -e "${RED}${BOLD}ERROR:${NC} $1"
 }
 
 print_warning() {
-	local msg="${1-}"
-	echo -e "${YELLOW}${BOLD}WARNING:${NC} ${msg}"
+    echo -e "${YELLOW}${BOLD}WARNING:${NC} $1"
 }
 
 print_success() {
-	local msg="${1-}"
-	echo -e "${GREEN}${BOLD}SUCCESS:${NC} ${msg}"
+    echo -e "${GREEN}${BOLD}SUCCESS:${NC} $1"
 }
 
 print_info() {
-	local msg="${1-}"
-	echo -e "${BLUE}${BOLD}INFO:${NC} ${msg}"
+    echo -e "${BLUE}${BOLD}INFO:${NC} $1"
 }
 
 print_divider() {
