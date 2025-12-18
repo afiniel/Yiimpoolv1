@@ -128,6 +128,7 @@ SQL_FILES=(
     2025-10-27-add_rinhash.sql
     2025-10-28-add_algo_phihash.sql
     2025-11-19-add_algo_meowpow.sql
+    2025-12-16-add_algo_soterg.sql
 )
 
 for file in "${SQL_FILES[@]}"; do
