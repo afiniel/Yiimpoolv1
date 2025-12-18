@@ -28,19 +28,27 @@ trap print_error ERR
 
 term_art
 
+print_info "Starting MariaDB setup"
+print_info "Using STORAGE_ROOT='$STORAGE_ROOT'"
+print_info "Using YiiMPDBName='${YiiMPDBName}'"
+print_info "Using YiiMPPanelName='${YiiMPPanelName}', StratumDBUser='${StratumDBUser}'"
+
 if [[ ("$wireguard" == "true") ]]; then
     source $STORAGE_ROOT/yiimp/.wireguard.conf
+    print_info "WireGuard enabled, loaded .wireguard.conf"
 fi
 
 MARIADB_VERSION='11.8'
 
 print_header "MariaDB Installation"
 print_info "Installing MariaDB version $MARIADB_VERSION"
+print_info "Pre-seeding MariaDB root password for version ${MARIADB_VERSION}"
 
 sudo debconf-set-selections <<< "maria-db-$MARIADB_VERSION mysql-server/root_password password $DBRootPassword"
 sudo debconf-set-selections <<< "maria-db-$MARIADB_VERSION mysql-server/root_password_again password $DBRootPassword"
 
 print_status "Installing MariaDB packages..."
+print_info "Running apt_install mariadb-server mariadb-client"
 apt_install mariadb-server mariadb-client
 print_success "MariaDB installation completed"
 
@@ -50,9 +58,11 @@ print_status "Creating database users for YiiMP..."
 if [[ "$wireguard" == "false" ]]; then
     DB_HOST="localhost"
     print_info "Using localhost for database connections"
+    print_info "wireguard=false, DB_HOST set to 'localhost'"
 else
     DB_HOST="$DBInternalIP"
     print_info "Using WireGuard IP ($DBInternalIP) for database connections"
+    print_info "wireguard=true, DB_HOST set to '$DBInternalIP'"
 fi
 
 print_status "Setting up database and user permissions..."
@@ -62,12 +72,14 @@ Q3="GRANT ALL ON ${YiiMPDBName}.* TO '${StratumDBUser}'@'${DB_HOST}' IDENTIFIED 
 Q4="FLUSH PRIVILEGES;"
 SQL="${Q1}${Q2}${Q3}${Q4}"
 
+print_info "Running initial SQL against MariaDB (create DB and grant privileges)"
 sudo mysql -u root -p"${DBRootPassword}" -e "$SQL"
 print_success "Database users created successfully"
 
 print_header "Database Configuration Files"
 print_status "Creating my.cnf configuration..."
 
+print_info "Writing MariaDB client configuration to '$STORAGE_ROOT/yiimp/.my.cnf'"
 echo "[clienthost1]
 user=${YiiMPPanelName}
 password=${PanelUserDBPassword}
@@ -84,6 +96,7 @@ password=${DBRootPassword}
 " | sudo -E tee "$STORAGE_ROOT/yiimp/.my.cnf" >/dev/null 2>&1
 
 sudo chmod 0600 "$STORAGE_ROOT/yiimp/.my.cnf"
+print_info "Set permissions 0600 on '$STORAGE_ROOT/yiimp/.my.cnf'"
 print_success "Database configuration file created"
 
 print_header "Database Import"
@@ -91,6 +104,7 @@ print_status "Importing YiiMP default database values..."
 cd "$STORAGE_ROOT/yiimp/yiimp_setup/yiimp/sql"
 
 print_status "Importing main database dump..."
+print_info "Importing main dump from '2024-03-06-complete_export.sql.gz' into database '${YiiMPDBName}'"
 sudo zcat 2024-03-06-complete_export.sql.gz | sudo mysql -u root -p"${DBRootPassword}" "${YiiMPDBName}"
 
 SQL_FILES=(
@@ -118,9 +132,12 @@ SQL_FILES=(
 
 for file in "${SQL_FILES[@]}"; do
     print_status "Importing $file..."
+    print_info "Processing SQL migration file '$file'"
     if [[ "$file" == *.gz ]]; then
+        print_info "File '$file' detected as gzip-compressed; using zcat"
         sudo zcat "$file" | sudo mysql -u root -p"${DBRootPassword}" "${YiiMPDBName}" --force --binary-mode
     else
+        print_info "File '$file' detected as plain SQL; using direct mysql import"
         sudo mysql -u root -p"${DBRootPassword}" "${YiiMPDBName}" --force < "$file"
     fi
 done
@@ -146,24 +163,30 @@ config_changes=(
 if [[ ("$wireguard" == "true") ]]; then
     config_changes+=("bind-address=$DBInternalIP")
     print_info "Setting bind address to $DBInternalIP for WireGuard"
+    print_info "Added 'bind-address=$DBInternalIP' to MariaDB configuration changes"
 fi
 
 print_status "Updating MariaDB configuration..."
 config_string=$(printf "%s\n" "${config_changes[@]}")
+print_info "Appending the following to /etc/mysql/my.cnf:"
+print_info "$config_string"
 sudo bash -c "echo \"$config_string\" >> /etc/mysql/my.cnf"
 
 print_status "Restarting MariaDB service..."
+print_info "Restarting MariaDB (mysql service) after configuration update"
 restart_service mysql
 print_success "Performance optimizations applied"
 
 print_header "phpMyAdmin Setup"
 print_status "Creating phpMyAdmin user..."
 
+print_info "Creating phpMyAdmin user '${PHPMyAdminUser}' with full privileges"
 sudo mysql -u root -p"${DBRootPassword}" -e "CREATE USER '${PHPMyAdminUser}'@'%' IDENTIFIED BY '${PHPMyAdminPassword}';"
 sudo mysql -u root -p"${DBRootPassword}" -e "GRANT ALL PRIVILEGES ON *.* TO '${PHPMyAdminUser}'@'%' WITH GRANT OPTION;"
 sudo mysql -u root -p"${DBRootPassword}" -e "FLUSH PRIVILEGES;"
 
 print_status "Restarting MariaDB service..."
+print_info "Restarting MariaDB (mysql service) after phpMyAdmin user creation"
 restart_service mysql
 print_success "phpMyAdmin user created successfully"
 
