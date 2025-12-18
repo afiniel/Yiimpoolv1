@@ -32,7 +32,7 @@ if [[ ("$wireguard" == "true") ]]; then
     source $STORAGE_ROOT/yiimp/.wireguard.conf
 fi
 
-MARIADB_VERSION='10.4'
+MARIADB_VERSION='11.8'
 
 print_header "MariaDB Installation"
 print_info "Installing MariaDB version $MARIADB_VERSION"
