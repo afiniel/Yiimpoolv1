@@ -177,7 +177,7 @@ print_header "Installing PHP"
 
 if [[ "$DISTRO" == "11" || "$DISTRO" == "12" || "$DISTRO" == "13" ]]; then
     if [ ! -f /etc/apt/sources.list.d/ondrej-php.list ]; then
-        print_status "Adding PHP repository for Debian"
+        print_status "Adding PHP repository for Debian $DISTRO"
         apt_install python3-launchpadlib apt-transport-https lsb-release ca-certificates
         curl -fsSL https://packages.sury.org/php/apt.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/php.gpg
         echo "deb [signed-by=/etc/apt/keyrings/php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" | \
@@ -186,7 +186,7 @@ if [[ "$DISTRO" == "11" || "$DISTRO" == "12" || "$DISTRO" == "13" ]]; then
     fi
 else
     if [ ! -f /etc/apt/sources.list.d/ondrej-php-bionic.list ]; then
-        print_status "Adding PHP repository for Ubuntu"
+        print_status "Adding PHP repository for Ubuntu $DISTRO"
         hide_output sudo add-apt-repository -y ppa:ondrej/php
     fi
 fi
