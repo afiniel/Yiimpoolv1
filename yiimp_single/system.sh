@@ -35,6 +35,9 @@ print_success "Timezone set to UTC"
 
 apt_install software-properties-common build-essential
 
+if [[  "$DISTRO" == "11" || "$DISTRO" == "12" || "$DISTRO" == "13" ]]; then
+    apt_install gnupg2
+fi
 # CertBot
 print_header "Installing CertBot"
 
