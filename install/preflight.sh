@@ -34,7 +34,9 @@ if [[ -f /etc/lsb-release ]]; then
 else
     
     DEBIAN_DESCRIPTION=$(cat /etc/debian_version | cut -d. -f1)
-    if [[ "${DEBIAN_DESCRIPTION}" == "12" ]]; then
+    if [[ "${DEBIAN_DESCRIPTION}" == "13" ]]; then
+        DISTRO=13
+    elif [[ "${DEBIAN_DESCRIPTION}" == "12" ]]; then
         DISTRO=12
     elif [[ "${DEBIAN_DESCRIPTION}" == "11" ]]; then
         DISTRO=11

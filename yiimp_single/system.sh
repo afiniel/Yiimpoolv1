@@ -51,7 +51,7 @@ elif [[ "$DISTRO" == "20" || "$DISTRO" == "22" || "$DISTRO" == "23" || "$DISTRO"
     hide_output sudo snap install --classic certbot
     sudo ln -s /snap/bin/certbot /usr/bin/certbot
     print_success "CertBot installation complete"
-elif [[ "$DISTRO" == "12" ]]; then
+elif [[ "$DISTRO" == "11" || "$DISTRO" == "12" || "$DISTRO" == "13" ]]; then
     print_status "Installing CertBot for Debian 12"
     hide_output sudo apt install -y certbot
     print_success "CertBot installation complete"
@@ -90,11 +90,14 @@ case "$DISTRO" in
     "24")  # Ubuntu 24.04
         REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.6/ubuntu noble main"
         ;;
+    "13")  # Debian 13
+        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.8/debian trixie main"
+        ;;
     "12")  # Debian 12
-        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.6/debian bookworm main"
+        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.8/debian bookworm main"
         ;;
     "11")  # Debian 11
-        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/10.6/debian bullseye main"
+        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.8/debian bullseye main"
         ;;
     *)
         print_error "Unsupported Ubuntu/Debian version: $DISTRO"
@@ -169,7 +172,7 @@ hide_output sudo apt-get update
 
 print_header "Installing PHP"
 
-if [[ "$DISTRO" == "11" || "$DISTRO" == "12" ]]; then
+if [[ "$DISTRO" == "11" || "$DISTRO" == "12" || "$DISTRO" == "13" ]]; then
     if [ ! -f /etc/apt/sources.list.d/ondrej-php.list ]; then
         print_status "Adding PHP repository for Debian"
         apt_install python3-launchpadlib apt-transport-https lsb-release ca-certificates

@@ -33,7 +33,7 @@ if [[ $DISTRO = "16" || $DISTRO = "17" || $DISTRO = "18" || $DISTRO = "19" || $D
     done
     print_success "Ubuntu MOTD configuration completed"
 
-elif [[ $DISTRO = "12" || $DISTRO = "11" ]]; then
+elif [[ $DISTRO = "11" || $DISTRO = "12" || $DISTRO = "13" ]]; then
     print_info "Setting up MOTD for Debian"
     cd $HOME/Yiimpoolv1/yiimp_single/debian/etc/update-motd.d
     sudo rm -f /etc/update-motd.d/00-header /etc/update-motd.d/10-sysinfo /etc/update-motd.d/90-footer
