@@ -79,28 +79,28 @@ case "$DISTRO" in
         REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,i386,ppc64el] https://mirror.mariadb.org/repo/10.4/ubuntu xenial main"
         ;;
     "18")  # Ubuntu 18.04
-        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el] https://mirror.mariadb.org/repo/10.11/ubuntu bionic main"
+        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=binary=amd64,binary=arm64,binary=ppc64el] https://mirror.mariadb.org/repo/10.11/ubuntu bionic main"
         ;;
     "20")  # Ubuntu 20.04
-        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.8/ubuntu focal main"
+        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=binary=amd64,binary=arm64,binary=ppc64el,binary=s390x] https://mirror.mariadb.org/repo/11.8/ubuntu focal main"
         ;;
     "22")  # Ubuntu 22.04
-        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.8/ubuntu jammy main"
+        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=binary=amd64,binary=arm64,binary=ppc64el,binary=s390x] https://mirror.mariadb.org/repo/11.8/ubuntu jammy main"
         ;;
     "23")  # Ubuntu 23.04
-        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.8/ubuntu lunar main"
+        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=binary=amd64,binary=arm64,binary=ppc64el,binary=s390x] https://mirror.mariadb.org/repo/11.8/ubuntu lunar main"
         ;;
     "24")  # Ubuntu 24.04
-        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.8/ubuntu noble main"
+        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=binary=amd64,binary=arm64,binary-ppc64el,binary-s390x] https://mirror.mariadb.org/repo/11.8/ubuntu noble main"
         ;;
     "13")  # Debian 13
-        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.8/debian trixie main"
+        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=binary=amd64,binary=arm64,binary=i386,binary=ppc64el] https://mirror.mariadb.org/repo/11.8/debian trixie main"
         ;;
     "12")  # Debian 12
-        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.8/debian bookworm main"
+        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=binary=amd64,binary=arm64,binary=i386,binary=ppc64el] https://mirror.mariadb.org/repo/11.8/debian bookworm main"
         ;;
     "11")  # Debian 11
-        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.8/debian bullseye main"
+        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=binary=amd64,binary=arm64,binary=i386,binary=ppc64el] https://mirror.mariadb.org/repo/11.8/debian bullseye main"
         ;;
     *)
         print_error "Unsupported Ubuntu/Debian version: $DISTRO"
