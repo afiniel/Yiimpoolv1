@@ -39,12 +39,12 @@ apt_install software-properties-common build-essential
 print_header "Installing CertBot"
 
 if [[ "$DISTRO" == "16" || "$DISTRO" == "18" ]]; then
-    print_status "Installing CertBot PPA for Ubuntu 16/18"
+    print_status "Installing CertBot PPA for Ubuntu $DISTRO"
     hide_output sudo add-apt-repository -y ppa:certbot/certbot
     hide_output sudo apt-get update
     print_success "CertBot installation complete"
 elif [[ "$DISTRO" == "20" || "$DISTRO" == "22" || "$DISTRO" == "23" || "$DISTRO" == "24" ]]; then
-    print_status "Installing CertBot via Snap for Ubuntu 20/22/23/24"
+    print_status "Installing CertBot via Snap for Ubuntu $DISTRO"
     hide_output sudo apt install -y snapd
     hide_output sudo snap install core
     hide_output sudo snap refresh core
@@ -52,7 +52,7 @@ elif [[ "$DISTRO" == "20" || "$DISTRO" == "22" || "$DISTRO" == "23" || "$DISTRO"
     sudo ln -s /snap/bin/certbot /usr/bin/certbot
     print_success "CertBot installation complete"
 elif [[ "$DISTRO" == "11" || "$DISTRO" == "12" || "$DISTRO" == "13" ]]; then
-    print_status "Installing CertBot for Debian 12"
+    print_status "Installing CertBot for Debian $DISTRO"
     hide_output sudo apt install -y certbot
     print_success "CertBot installation complete"
 fi
