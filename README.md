@@ -49,6 +49,7 @@ This installer provides an automated way to set up a full Yiimp mining pool on U
 ⚠️ Installation Works (Limited Testing):
 - Debian 11
 - Debian 12 (Build Stratum not working)
+- Debian 13
 
 ## Installation
 
