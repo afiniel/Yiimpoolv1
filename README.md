@@ -39,6 +39,7 @@ This installer provides an automated way to set up a full Yiimp mining pool on U
 
 ### Ubuntu
 ⚠️ Installation Works (Limited Testing):
+- Ubuntu 25.04
 - Ubuntu 24.04 LTS
 - Ubuntu 23.04
 - Ubuntu 22.04 LTS
