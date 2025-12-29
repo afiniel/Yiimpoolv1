@@ -46,7 +46,7 @@ if [[ "$DISTRO" == "16" || "$DISTRO" == "18" ]]; then
     hide_output sudo add-apt-repository -y ppa:certbot/certbot
     hide_output sudo apt-get update
     print_success "CertBot installation complete"
-elif [[ "$DISTRO" == "20" || "$DISTRO" == "22" || "$DISTRO" == "23" || "$DISTRO" == "24" ]]; then
+elif [[ "$DISTRO" == "20" || "$DISTRO" == "22" || "$DISTRO" == "23" || "$DISTRO" == "24" || "$DISTRO" == "25" ]]; then
     print_status "Installing CertBot via Snap for Ubuntu $DISTRO"
     hide_output sudo apt install -y snapd
     hide_output sudo snap install core
