@@ -88,7 +88,7 @@ case "$DISTRO" in
         REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=binary=amd64,binary=arm64,binary=ppc64el,binary=s390x] https://mirror.mariadb.org/repo/11.8/ubuntu jammy main"
         ;;
     "23")  # Ubuntu 23.04
-        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=binary=amd64,binary=arm64,binary=ppc64el,binary=s390x] https://mirror.mariadb.org/repo/11.8/ubuntu lunar main"
+        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=binary=amd64,binary=arm64,binary=ppc64el,binary=s390x] https://mirror.mariadb.org/repo/11.8/ubuntu mantic main"
         ;;
     "24")  # Ubuntu 24.04
         REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=binary=amd64,binary=arm64,binary-ppc64el,binary-s390x] https://mirror.mariadb.org/repo/11.8/ubuntu noble main"
@@ -101,6 +101,9 @@ case "$DISTRO" in
         ;;
     "11")  # Debian 11
         REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=binary=amd64,binary=arm64,binary=i386,binary=ppc64el] https://mirror.mariadb.org/repo/11.8/debian bullseye main"
+        ;;
+    "25")  # Ubuntu 25.04
+        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=binary=amd64,binary=arm64,binary=i386,binary=ppc64el] https://mirror.mariadb.org/repo/11.8/ubuntu plucky main"
         ;;
     *)
         print_error "Unsupported Ubuntu/Debian version: $DISTRO"

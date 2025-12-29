@@ -103,8 +103,8 @@ sudo ln -s ${STORAGE_ROOT}/yiimp/site/configuration/serverconfig.php /etc/yiimp/
 
 print_status "Updating configuration paths..."
 sudo sed -i "s|/etc/yiimp/serverconfig.php|/etc/yiimp/serverconfig.php|g" $STORAGE_ROOT/yiimp/site/web/index.php
-sudo sed -i "s|/etc/yiimp/serverconfig.php|/home/crypto-data/yiimp/site/configuration/serverconfig.php|g" $STORAGE_ROOT/yiimp/site/web/runconsole.php
-sudo sed -i "s|/etc/yiimp/serverconfig.php|/etc/yiimp/serverconfig.php|g" $STORAGE_ROOT/yiimp/site/web/run.php
+sudo sed -i "s|serverconfig.php|/home/crypto-data/yiimp/site/configuration/serverconfig.php|g" $STORAGE_ROOT/yiimp/site/web/runconsole.php
+sudo sed -i "s|serverconfig.php|/etc/yiimp/serverconfig.php|g" $STORAGE_ROOT/yiimp/site/web/run.php
 sudo sed -i "s|/etc/yiimp/serverconfig.php|/etc/yiimp/serverconfig.php|g" $STORAGE_ROOT/yiimp/site/web/yaamp/yiic.php
 sudo sed -i "s|/etc/yiimp/serverconfig.php|/etc/yiimp/serverconfig.php|g" $STORAGE_ROOT/yiimp/site/web/yaamp/modules/thread/CronjobController.php
 

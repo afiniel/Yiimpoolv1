@@ -27,6 +27,8 @@ if [[ -f /etc/lsb-release ]]; then
         DISTRO=18
     elif [[ "${UBUNTU_DESCRIPTION}" == "16.04" ]]; then
         DISTRO=16
+    elif [[ "${UBUNTU_DESCRIPTION}" == "25.04" ]]; then
+        DISTRO=25
     else
         echo "This script only supports Ubuntu 16.04, 18.04, 20.04, 23.04, and 24.04. Debian 12 is also supported."
         exit 1

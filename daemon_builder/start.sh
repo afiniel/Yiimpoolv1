@@ -14,7 +14,7 @@ if [ ! -d $STORAGE_ROOT/daemon_builder ]; then
 sudo mkdir -p $STORAGE_ROOT/daemon_builder
 fi
 
-if [[ "$DISTRO" == "24" || "$DISTRO" == "23" || "$DISTRO" == "22" ]]; then
+if [[ "$DISTRO" == "25" || "$DISTRO" == "24" || "$DISTRO" == "23" || "$DISTRO" == "22" ]]; then
     sudo chmod 755 $STORAGE_ROOT/daemon_builder
 fi
 # Start the DeamonBuilder installation.
