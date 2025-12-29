@@ -32,10 +32,6 @@ print_success "DaemonBuilder utilities configured"
 
 print_header "Installing All Required Packages"
 
-if [[ ("${DISTRO}" == "18") ]]; then
-	hide_output sudo add-apt-repository -y ppa:bitcoin/bitcoin
-fi
-
 print_status "Updating package lists..."
 hide_output sudo apt-get update
 hide_output sudo apt-get -y upgrade
@@ -124,17 +120,6 @@ DAEMONBUILDER_PACKAGES=(
 )
 
 hide_output sudo apt-get -y install "${DAEMONBUILDER_PACKAGES[@]}"
-
-if [[ "${DISTRO}" == "18" ]]; then
-    print_status "Installing Ubuntu 18.04 specific packages..."
-    UBUNTU_18_PACKAGES=(
-        "libz-dev"
-        "libminiupnpc10"
-        "libdb4.8-dev"
-        "libdb4.8++-dev"
-    )
-    hide_output sudo apt-get -y install "${UBUNTU_18_PACKAGES[@]}"
-fi
 
 print_success "All packages installed successfully"
 

@@ -16,7 +16,7 @@ clear
 message_box "Yiimpool Installer $VERSION" \
 "Hello and thanks for using the Yiimpool Yiimp Installer!
 \n\nInstallation for the most part is fully automated. In most cases any user responses that are needed are asked prior to the installation.
-\n\nNOTE: You should only install this on a brand new Ubuntu 20.04 , Ubuntu 18.04 or Ubuntu 16.04 installation."
+\n\nNOTE: You should only install this on a brand new server."
 
 # Root warning message box
 message_box "Yiimpool Installer $VERSION" \
