@@ -128,7 +128,7 @@ Built-in coin daemon compiler accessible via the `daemonbuilder` command. Featur
 
 ## Cred
 
-https://github.com/cryptopool-builders/Multi-Pool-Installer
+Cryptopool.builders: https://github.com/cryptopool-builders/Multi-Pool-Installer
 
 Yiimp source: https://github.com/Kudaraidee/yiimp
 
