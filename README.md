@@ -51,7 +51,11 @@ This installer provides an automated way to set up a full Yiimp mining pool on U
 - Debian 12 (Build Stratum not working)
 - Debian 13
 
+### pi os Just do not use it..
+Raspberry pi os Debian 13
+
 ## Installation
+
 
 ### Quick Install
 ```bash
