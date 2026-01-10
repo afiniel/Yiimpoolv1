@@ -64,7 +64,7 @@ The installer will guide you through:
 2. SSL certificate installation
 3. Database credentials
 4. Admin portal location
-5. Email settings
+5. Email settings - Need update
 6. Stratum configuration
 
 ## Post-Installation Steps
