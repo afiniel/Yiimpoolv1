@@ -61,11 +61,11 @@ curl https://raw.githubusercontent.com/afiniel/Yiimpoolv1/master/install.sh | ba
 ### Configuration Steps
 The installer will guide you through:
 1. Domain setup (main domain or subdomain)
-2. SSL certificate installation
+2. SSL certificate installation - Need update
 3. Database credentials
-4. Admin portal location
-5. Email settings - Need update
-6. Stratum configuration
+4. Email settings - Need update
+5. Stratum configuration
+6. DaemonBulder tool - Need update
 
 ## Post-Installation Steps
 1. **Required**: Reboot your server after installation
