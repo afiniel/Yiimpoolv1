@@ -126,6 +126,10 @@ Built-in coin daemon compiler accessible via the `daemonbuilder` command. Featur
 3. Do not modify default file permissions
 4. Regularly backup your data
 
+## Cred
+
+https://github.com/cryptopool-builders/Multi-Pool-Installer
+
 ## Support
 
 For assistance:
