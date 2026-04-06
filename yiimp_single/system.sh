@@ -41,7 +41,7 @@ hide_output sudo apt install -y software-properties-common build-essential gnupg
 
 # CertBot
 print_header "Installing CertBot"
-if [[ "$DISTRO" == "20" || "$DISTRO" == "22" || "$DISTRO" == "23" || "$DISTRO" == "24" || "$DISTRO" == "25" ]]; then
+if [[ "$DISTRO" == "22" || "$DISTRO" == "23" || "$DISTRO" == "24" || "$DISTRO" == "25" ]]; then
     print_status "Installing CertBot via Snap for Ubuntu $DISTRO"
     hide_output sudo apt install -y snapd
     hide_output sudo snap install core
@@ -103,20 +103,26 @@ esac
 # Write MariaDB repository to a dedicated sources list file
 echo "$REPO_LINE" | sudo tee /etc/apt/sources.list.d/mariadb.list >/dev/null
 print_success "MariaDB repository setup complete"
-hide_output sudo apt-get update
+
 
 export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
+
+print_header "Updating System"
+
+hide_output sudo apt-get update
 hide_output sudo -E apt-get upgrade -y
 hide_output sudo -E apt-get dist-upgrade -y
 hide_output sudo -E apt-get autoremove -y
 
+print_success "System updated"
+
 print_header "Installing Base System Packages"
 
 hide_output sudo apt install -y python3 python3-dev python3-pip
-hide_output sudo apt install -y wget curl git sudo coreutils bc
+hide_output sudo apt install -y coreutils bc
 hide_output sudo apt install -y haveged pollinate unzip
-hide_output sudo apt install -y unattended-upgrades cron ntp fail2ban screen rsyslog lolcat nginx haproxy supervisor
+hide_output sudo apt install -y unattended-upgrades cron ntp fail2ban screen rsyslog nginx haproxy supervisor
 
 print_success "Base system packages installed"
 
@@ -157,9 +163,8 @@ if [ -f /usr/sbin/apache2 ]; then
     print_status "Removing Apache..."
     hide_output sudo apt-get -y purge apache2 apache2-*
     hide_output sudo apt-get -y --purge autoremove
+    print_success "Apache removed"
 fi
-
-hide_output sudo apt-get update
 
 print_header "Installing PHP 8.1"
 
@@ -169,9 +174,11 @@ if [[ "$DISTRO" == "11" || "$DISTRO" == "12" || "$DISTRO" == "13" ]]; then
         hide_output sudo apt install -y apt-transport-https lsb-release ca-certificates
         curl -fsSL https://packages.sury.org/php/apt.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/php.gpg
         echo "deb [signed-by=/etc/apt/keyrings/php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" | \
-            sudo tee /etc/apt/sources.list.d/php.list
+        sudo tee /etc/apt/sources.list.d/php.list
         hide_output sudo apt-get update
+        print_success "PHP repository added"
     fi
+    print_success "PHP repository added"
 else
     # Check file content rather than filename — handles both .list (older Ubuntu)
     # and .sources (DEB822 format, Ubuntu 22.04+) without a fragile glob.
@@ -182,6 +189,7 @@ else
     else
         print_status "PHP repository already exists for Ubuntu $DISTRO"
     fi
+    print_success "PHP repository added"
 fi
 
 hide_output sudo apt-get update
@@ -198,6 +206,7 @@ if ! apt-cache show php8.1 &>/dev/null; then
         print_error "PHP 8.1 is still not available after re-adding the PPA. Cannot continue."
         exit 1
     fi
+    print_success "PHP repository added"
 fi
 
 print_status "Installing PHP packages..."
@@ -219,8 +228,8 @@ hide_output sudo apt install -y automake cmake gnupg2 ca-certificates lsb-releas
 hide_output sudo apt install -y libnghttp2-dev librtmp-dev libssh2-1 libssh2-1-dev libldap2-dev libidn11-dev libpsl-dev libkrb5-dev php8.1-memcache php8.1-memcached memcached
 hide_output sudo apt install -y php8.1-mysql php8.1-mbstring
 hide_output sudo apt install -y libssh-dev libbrotli-dev php8.1-curl
+
 print_success "PHP 8.1 packages installed"
-print_success "PHP installation complete"
 
 print_header "Installing phpMyAdmin"
 _pma_dir=$(mktemp -d)
@@ -249,19 +258,18 @@ sudo update-alternatives --set php /usr/bin/php8.1
 print_success "PHP version set to 8.1"
 
 print_header "Cloning YiiMP Repository"
-if [ -z "${YiiMPRepo:-}" ]; then
-    print_error "YiiMPRepo is not set. Cannot clone YiiMP repository."
-    exit 1
-fi
-if [ -z "${STORAGE_ROOT:-}" ]; then
-    print_error "STORAGE_ROOT is not set. Cannot determine clone destination."
-    exit 1
-fi
+
 hide_output sudo git clone "${YiiMPRepo}" "$STORAGE_ROOT/yiimp/yiimp_setup/yiimp"
+
 print_success "YiiMP repository cloned successfully"
 
-restart_service nginx
-print_success "Nginx restarted"
+print_header "starting services"
+
+hide_output sudo systemctl start nginx
+hide_output sudo systemctl start php8.1-fpm
+
+print_success "services started"
+# restart_service nginx
 
 set +eu +o pipefail
 cd "$HOME/Yiimpoolv1/yiimp_single"
