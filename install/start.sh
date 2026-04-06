@@ -6,14 +6,17 @@
 # Updated by Afiniel for yiimpool use...                                         #
 ##################################################################################
 
-# Include functions for color output and other utilities
-source /etc/functions.sh
-
-# Define colors if not defined in functions.sh
-YELLOW=${YELLOW:-"\033[1;33m"}
-GREEN=${GREEN:-"\033[0;32m"}
-RED=${RED:-"\033[0;31m"}
-NC=${NC:-"\033[0m"} # No Color
+# Include functions for color output and other utilities.
+if [ -r /etc/functions.sh ]; then
+    
+    source /etc/functions.sh
+elif [ -r "$HOME/Yiimpoolv1/install/functions.sh" ]; then
+    
+    source "$HOME/Yiimpoolv1/install/functions.sh"
+else
+    echo "YiimPool: functions.sh not found (install Yiimpoolv1 under \$HOME or run from a configured system)." >&2
+    exit 1
+fi
 
 # Recall the last settings used if we're running this a second time.
 if [ -f /etc/yiimpool.conf ]; then
@@ -37,11 +40,12 @@ fi
 if [[ "$FIRST_TIME_SETUP" == "1" ]]; then
     clear
     cd "$HOME/Yiimpoolv1/install"
+    
+    source functions.sh
 
     print_header "First-time YiimPool setup"
     print_status "Installing helper scripts to /etc and /usr/bin"
     # Copy functions to /etc
-    source functions.sh
     sudo cp -r functions.sh /etc/
     sudo cp -r editconf.py /usr/bin
     sudo chmod +x /usr/bin/editconf.py
