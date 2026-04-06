@@ -50,29 +50,44 @@ export LC_TYPE=en_US.UTF-8
 # Fix so line drawing characters are shown correctly in Putty on Windows. See #744.
 export NCURSES_NO_UTF8_ACS=1
 
+print_header "YiimPool single-server installation"
+print_info "Long pauses are normal while apt downloads packages or MariaDB imports SQL (only a spinner may show)."
+print_info "If apt waits indefinitely, unattended-upgrades may hold the lock—wait, or stop that service and retry."
+
 # Create the temporary installation directory if it doesn't already exist.
 if [ ! -d $STORAGE_ROOT/yiimp/yiimp_setup ]; then
+    print_status "Creating storage directories and installer log under $STORAGE_ROOT/yiimp"
     sudo mkdir -p $STORAGE_ROOT/{wallets,yiimp/{yiimp_setup/log,site/{web,stratum,configuration,crons,log},starts}}
     sudo touch $STORAGE_ROOT/yiimp/yiimp_setup/log/installer.log
 fi
 
 sudo chmod 755 /home/crypto-data/
 
-# Start the installation.
+print_header "WireGuard and network mode"
 source menu.sh
+print_header "Pool configuration (interactive)"
 source questions.sh
 source $HOME/Yiimpoolv1/yiimp_single/.wireguard.install.cnf
 
 if [[ ("$wireguard" == "true") ]]; then
+  print_header "WireGuard VPN setup"
   source wireguard.sh
+  print_success "WireGuard configuration completed"
 fi
 
+print_header "System packages, PHP, and web stack"
 source system.sh
+print_header "SSL certificates"
 source self_ssl.sh
+print_header "MariaDB and YiiMP database"
 source db.sh
+print_header "Nginx and PHP-FPM tuning"
 source nginx_upgrade.sh
+print_header "YiiMP web application"
 source web.sh
+print_header "Stratum server build"
 bash stratum.sh
+print_header "Crypto compile utilities"
 source compile_crypto.sh
 #source daemon.sh
 
@@ -83,6 +98,7 @@ source compile_crypto.sh
 # source send_mail.sh
 # fi
 
+print_header "Cleanup, MOTD, and hardening"
 source server_cleanup.sh
 source motd.sh
 source server_harden.sh
@@ -154,12 +170,12 @@ print_message() {
     
     
     echo -e "${YIIMP_BLUE}║${YIIMP_RESET} ${YIIMP_CYAN}Important Notes:${YIIMP_RESET}"
-    echo -e "${YIIMP_BLUE}║${YIIMP_RESET} • All pool credentials and are stored in:${YIIMP_RESET}"
+    echo -e "${YIIMP_BLUE}║${YIIMP_RESET} • All pool credentials are stored in:${YIIMP_RESET}"
     echo -e "${YIIMP_BLUE}║${YIIMP_RESET}   ${YIIMP_GREEN}$STORAGE_ROOT/yiimp/.yiimp.conf${YIIMP_RESET}"
     echo -e "${YIIMP_BLUE}║${YIIMP_RESET} • This includes: Database credentials, Stratum passwords,${YIIMP_RESET}"
     echo -e "${YIIMP_BLUE}║${YIIMP_RESET}   phpMyAdmin users, and other important settings${YIIMP_RESET}"
     echo -e "${YIIMP_BLUE}║${YIIMP_RESET} • Stratum ports are blocked by default${YIIMP_RESET}"
-    echo -e "${YIIMP_BLUE}║${YIIMP_RESET} • Use ${YIIMP_GREEN}ufw allow PORT , or use ${YIIMP_GREEN}addport${YIIMP_WHITE} to open ports${YIIMP_RESET}"
+    echo -e "${YIIMP_BLUE}║${YIIMP_RESET} • Open stratum ports with ${YIIMP_GREEN}ufw allow <port>${YIIMP_RESET} or the ${YIIMP_GREEN}addport${YIIMP_WHITE} helper${YIIMP_RESET}"
     echo -e "${YIIMP_BLUE}║${YIIMP_RESET}"
     
    

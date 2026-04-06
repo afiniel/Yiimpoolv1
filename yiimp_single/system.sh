@@ -37,7 +37,9 @@ if [ "$(cat /etc/timezone 2>/dev/null)" != "UTC" ]; then
 fi
 print_success "Timezone set to UTC"
 
+print_status "Installing common packages"
 hide_output sudo apt install -y software-properties-common build-essential gnupg2
+print_success "Common packages installed"
 
 # CertBot
 print_header "Installing CertBot"
@@ -108,6 +110,8 @@ print_success "MariaDB repository setup complete"
 export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
 
+prepare_apt_for_install
+
 print_header "Updating System"
 
 hide_output sudo apt-get update
@@ -117,12 +121,15 @@ hide_output sudo -E apt-get autoremove -y
 
 print_success "System updated"
 
+prepare_apt_for_install
+
 print_header "Installing Base System Packages"
 
 hide_output sudo apt install -y python3 python3-dev python3-pip
 hide_output sudo apt install -y coreutils bc
 hide_output sudo apt install -y haveged pollinate unzip
-hide_output sudo apt install -y unattended-upgrades cron ntp fail2ban screen rsyslog nginx haproxy supervisor
+# ntp (classic) conflicts with systemd-timesyncd on Ubuntu 24.04+ (time-daemon); ntpdate is enough for one-shot syncs.
+hide_output sudo apt install -y unattended-upgrades cron ntpdate fail2ban screen rsyslog nginx haproxy supervisor
 
 print_success "Base system packages installed"
 

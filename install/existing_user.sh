@@ -12,7 +12,8 @@ clear
 
 # Get logged in user name
 whoami=`whoami`
-echo -e " Modifying existing user $whoami for yiimpool support."
+print_header "Existing user setup"
+print_status "Granting sudo and yiimpool command for user $whoami"
 sudo usermod -aG sudo ${whoami}
 
 echo '# yiimp
@@ -58,6 +59,6 @@ DOGEDON="DKBddo8Qoh19PCFtopBkwTpcEU1aAqdM7S"' | sudo -E tee /etc/yiimpooldonate.
 cd ~
 sudo setfacl -m u:${whoami}:rwx /home/${whoami}/Yiimpoolv1
 clear
-echo -e "$YELLOW Your User:$MAGENTA ${whoami}$YELLOW has been modified for yiimpool support. ${NC}"
-echo -e "$YELLOW You must$RED reboot$YELLOW the system for the new permissions to update and type$GREEN yiimpool$YELLOW to continue setup...${NC}"
+print_success "User $whoami is configured for YiimPool (passwordless sudo, yiimpool command)"
+print_warning "Reboot so group membership applies, then run: yiimpool"
 exit 0

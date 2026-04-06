@@ -184,10 +184,34 @@ function daemonbuiler_files {
 	sleep 2
 }
 
+# Stop unattended-upgrades / apt-daily and wait until dpkg locks are free so installs do not
+# block on "Waiting for cache lock" (common right after boot or during security updates).
+function prepare_apt_for_install {
+	sudo systemctl stop unattended-upgrades.service 2>/dev/null || true
+	sudo systemctl stop apt-daily.service 2>/dev/null || true
+	sudo systemctl stop apt-daily-upgrade.service 2>/dev/null || true
+	local max_wait=600
+	local w=0
+	if command -v fuser >/dev/null 2>&1; then
+		while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 \
+			|| sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1; do
+			sleep 2
+			w=$((w + 2))
+			if [ "$w" -ge "$max_wait" ]; then
+				echo "prepare_apt_for_install: timed out after ${max_wait}s waiting for dpkg lock" >&2
+				return 1
+			fi
+		done
+	fi
+	return 0
+}
+
 function hide_output {
 	OUTPUT=$(mktemp)
 	$@ &>$OUTPUT &
+	local _hpid=$!
 	spinner
+	wait "$_hpid"
 	E=$?
 	if [ $E != 0 ]; then
 		echo
@@ -524,26 +548,26 @@ upgrade_stratum() {
 
 
 display_version_info() {
-    echo -e "${YELLOW}Current Version: ${GREEN}$VERSION${NC}"
-    echo -e "${YELLOW}Checking for updates...${NC}"
+    print_status "Installed YiimPool installer version: $VERSION"
+    print_info "Checking GitHub for a newer release tag"
 
     cd $HOME/Yiimpoolv1
     sudo git fetch --tags
     LATEST_TAG=$(sudo git describe --tags `sudo git rev-list --tags --max-count=1`)
     
     if [ "$VERSION" != "$LATEST_TAG" ]; then
-        echo -e "${GREEN}New version available: $LATEST_TAG${NC}"
-        echo -e "${YELLOW}Would you like to update? (y/n)${NC}"
+        print_warning "New version available: $LATEST_TAG"
+        print_status "Update the installer from Git? (y/n)"
         read -r update_choice
         
         if [[ "$update_choice" =~ ^[Yy]$ ]]; then
             cd $HOME/Yiimpoolv1/yiimp_upgrade
             source upgrade.sh --full
         else
-            echo -e "${YELLOW}Update skipped${NC}"
+            print_info "Update skipped"
         fi
     else
-        echo -e "${GREEN}You are running the latest version${NC}"
+        print_success "You are on the latest tagged version"
     fi
     echo
 }

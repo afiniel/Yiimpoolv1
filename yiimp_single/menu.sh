@@ -16,7 +16,7 @@ source /etc/yiimpoolversion.conf
 export TERM=${TERM:-xterm}
 export NCURSES_NO_UTF8_ACS=1
 
-RESULT=$(dialog --stdout --default-item 1 --title "YiimPool YiiMP Installer $VERSION" --menu "Choose an option" -1 60 5 \
+RESULT=$(dialog --stdout --default-item 1 --title "YiimPool YiiMP installer $VERSION" --menu "Choose WireGuard mode for this pool" -1 60 5 \
     ' ' "═══  Install YiiMP with WireGuard VPN?  ═══" \
     1 "Yes - Install with WireGuard (Multi-Server)" \
     2 "No  - Install without WireGuard (Single-Server)" \
@@ -30,10 +30,10 @@ if [ $DIALOG_EXIT -ne 0 ]; then
         clear
         exit 0
     elif [ $DIALOG_EXIT -eq 255 ]; then
-        echo "Error: Dialog cannot access the terminal."
+        print_error "Dialog cannot access the terminal (need an interactive TTY)"
         exit 1
     else
-        echo "Dialog exited with code: $DIALOG_EXIT"
+        print_error "Dialog exited with code $DIALOG_EXIT"
         exit 1
     fi
 fi
@@ -61,7 +61,7 @@ case "$RESULT" in
         ;;
     *)
         clear;
-        echo "Invalid selection."
+        print_error "Invalid menu selection"
         exit 1;
         ;;
 esac

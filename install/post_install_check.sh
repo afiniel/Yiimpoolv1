@@ -56,7 +56,7 @@ if [ -r "$STORAGE_ROOT/yiimp/.yiimp.conf" ]; then
     fi
 fi
 
-print header "Yiimpool Post-Install Checks"
+print header "YiimPool post-install checks"
 
 # 1) System services
 print status "Checking core services"

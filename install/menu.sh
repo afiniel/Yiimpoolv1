@@ -14,7 +14,7 @@ source /etc/functions.sh
 
 display_version_info
 
-RESULT=$(dialog --stdout --nocancel --default-item 1 --title "YiimPool Menu $VERSION" --menu "Choose an option" -1 60 6 \
+RESULT=$(dialog --stdout --nocancel --default-item 1 --title "YiimPool menu $VERSION" --menu "Install the pool or open maintenance tools" -1 60 6 \
     ' ' "═══════════  YiimPool Installer ═══════════" \
     1 "Install YiiMP Single Server" \
     2 "Manage & Upgrade Options" \
@@ -23,20 +23,22 @@ RESULT=$(dialog --stdout --nocancel --default-item 1 --title "YiimPool Menu $VER
 case "$RESULT" in
     1)
         clear
-        echo "Preparing to install YiiMP Single Server..."
+        print_header "YiiMP single-server install"
+        print_status "Starting the WireGuard prompt and pool installer (this can take a long time)"
         cd $HOME/Yiimpoolv1/yiimp_single
         source start.sh
         ;;
     2)
         clear
+        print_header "Manage and upgrade"
         cd $HOME/Yiimpoolv1/install
         source options.sh
         ;;
     3)
         clear
         motd
-        echo -e "${GREEN}Exiting YiimPool Menu${NC}"
-        echo -e "${YELLOW}Type 'yiimpool' anytime to return to the menu${NC}"
+        print_success "Exited YiimPool menu"
+        print_info "Run yiimpool anytime to open this menu again"
         exit 0
         ;;
 esac

@@ -15,7 +15,7 @@ source /etc/functions.sh
 source /etc/yiimpoolversion.conf
 
 show_menu() {
-    RESULT=$(dialog --stdout --title "YiimPool Options $VERSION" --menu "Choose an option" -1 65 10 \
+    RESULT=$(dialog --stdout --title "YiimPool options $VERSION" --menu "Upgrades and maintenance tools" -1 65 10 \
         ' ' "═══════════  Upgrade ═══════════" \
         1 "Upgrade YiimPool Installer" \
         2 "Upgrade Stratum Only" \
@@ -37,21 +37,21 @@ show_menu() {
             ;;
         2)
             clear
-            print_status "Starting stratum upgrade..."
+            print_status "Starting stratum-only upgrade"
             cd "$HOME/Yiimpoolv1/yiimp_upgrade"
             source upgrade.sh --stratum-only
             exit 0
             ;;
         3)
             clear
-            print_status "Starting Add New Stratum Server..."
+            print_status "Starting add-stratum-server flow"
             cd "$HOME/Yiimpoolv1/install"
             source start_add_stratum.sh
             exit 0
             ;;
         4)
             clear
-            print_status "Starting restore from backup..."
+            print_status "Starting restore from backup"
             cd "$HOME/Yiimpoolv1/yiimp_upgrade/utils"
             source restore.sh
             exit 0
@@ -65,28 +65,28 @@ show_menu() {
             ;;
         6)
             clear
-            print_status "Update History (last 30 days):"
+            print_status "Git history (last 30 days)"
             echo
             cd "$HOME/Yiimpoolv1"
             git log --pretty=format:"%C(yellow)%h%Creset  %s  %C(cyan)(%cr)%Creset  <%an>" \
                 --since="30 days ago" \
-                || echo "No git history available."
+                || print_warning "No git history available"
             echo
-            echo -e "${YELLOW}Press Enter to return to the menu...${NC}"
+            print_info "Press Enter to return to this menu"
             read -r
             show_menu
             ;;
         7)
             clear
-            print_status "Entering Database Tool Menu..."
+            print_status "Opening database tool menu"
             cd "$HOME/Yiimpoolv1/yiimp_upgrade"
             source dbtoolmenu.sh
             ;;
         8)
             clear
             motd
-            echo -e "${GREEN}Exiting YiimPool Options Menu${NC}"
-            echo -e "${YELLOW}Type 'yiimpool' anytime to return to the menu.${NC}"
+            print_success "Exited Manage & Upgrade menu"
+            print_info "Run yiimpool anytime to open the main menu again"
             exit 0
             ;;
         *)
@@ -97,4 +97,6 @@ show_menu() {
 
 # Start the menu
 clear
+print_header "Manage and upgrade"
+print_info "Upgrades, stratum servers, backups, health check, and database tools"
 show_menu

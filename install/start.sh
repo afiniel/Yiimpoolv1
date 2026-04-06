@@ -17,44 +17,45 @@ NC=${NC:-"\033[0m"} # No Color
 
 # Recall the last settings used if we're running this a second time.
 if [ -f /etc/yiimpool.conf ]; then
-    echo -e "${YELLOW}Loading previous configuration settings...${NC}\n"
+    print_status "Loading previous configuration from /etc/yiimpool.conf"
     # Load the old .conf file to get existing configuration options loaded
     # into variables with a DEFAULT_ prefix.
     cat /etc/yiimpool.conf | sed s/^/DEFAULT_/ >/tmp/yiimpool.prev.conf
     source /tmp/yiimpool.prev.conf
-    echo -e "${GREEN}Loaded previous configuration settings.${NC}\n"
-    echo -e "${YELLOW}Loading donation settings and version information...${NC}\n"
+    print_success "Previous configuration loaded"
+    print_status "Loading donation settings and version information"
     source /etc/yiimpooldonate.conf
     source /etc/yiimpoolversion.conf
-    echo -e "${GREEN}Loaded donation settings and version information.${NC}\n"
+    print_success "Donation and version information loaded"
     rm -f /tmp/yiimpool.prev.conf
-    echo -e "${GREEN}Removed temporary previous configuration file.${NC}\n"
+    print_info "Removed temporary yiimpool.prev.conf"
 else
     FIRST_TIME_SETUP=1
-    echo -e "${YELLOW}First-time setup detected.${NC}\n"
+    print_warning "First-time setup detected (no /etc/yiimpool.conf yet)"
 fi
 
 if [[ "$FIRST_TIME_SETUP" == "1" ]]; then
     clear
     cd "$HOME/Yiimpoolv1/install"
 
-    echo -e "${YELLOW}Performing first-time setup...${NC}\n"
+    print_header "First-time YiimPool setup"
+    print_status "Installing helper scripts to /etc and /usr/bin"
     # Copy functions to /etc
     source functions.sh
     sudo cp -r functions.sh /etc/
     sudo cp -r editconf.py /usr/bin
     sudo chmod +x /usr/bin/editconf.py
-    echo -e "${GREEN}Copied functions and editconf.py to system directories.${NC}\n"
+    print_success "functions.sh and editconf.py installed"
 
     # Check system setup: Are we running as root on Ubuntu 22.04+ on a
     # machine with enough memory?
     # If not, this shows an error and exits.
-    echo -e "${YELLOW}Running preflight system checks...${NC}\n"
+    print_header "Pre-flight system checks"
     source preflight.sh
 
     # Ensure Python reads/writes files in UTF-8.
     if ! locale -a | grep en_US.utf8 >/dev/null; then
-        echo -e "${YELLOW}Generating en_US.UTF-8 locale...${NC}\n"
+        print_status "Generating en_US.UTF-8 locale"
         hide_output locale-gen en_US.UTF-8
     fi
 
@@ -62,23 +63,23 @@ if [[ "$FIRST_TIME_SETUP" == "1" ]]; then
     export LC_ALL=en_US.UTF-8
     export LANG=en_US.UTF-8
     export LC_TYPE=en_US.UTF-8
-    echo -e "${GREEN}Set system locale to en_US.UTF-8.${NC}\n"
+    print_success "Locale set to en_US.UTF-8"
 
     # Fix so line drawing characters are shown correctly in Putty on Windows. See #744.
     export NCURSES_NO_UTF8_ACS=1
-    echo -e "${GREEN}Configured NCURSES for correct line drawing characters.${NC}\n"
+    print_info "NCURSES_NO_UTF8_ACS=1 (better line drawing in PuTTY)"
 
-    # Check for user
-    echo -e "${YELLOW}Installing necessary packages for setup to continue...${NC}\n"
+    print_header "Bootstrap packages"
+    print_status "Installing figlet, lolcat, dialog, git, and Python tools (apt update may take a minute)"
     hide_output sudo apt-get update
     hide_output sudo apt-get install -y figlet
     hide_output sudo apt-get install -y lolcat
     hide_output sudo apt-get install -y dialog python3 python3-pip acl nano git apt-transport-https
-    echo -e "${GREEN}Installed necessary packages.${NC}\n"
+    print_success "Bootstrap packages installed"
 
     # Are we running as root?
     if [[ $EUID -ne 0 ]]; then
-        echo -e "${YELLOW}Running as a non-root user. Displaying welcome message...${NC}\n"
+        print_status "Non-root session: showing welcome dialog"
         # Welcome
         message_box "Yiimpool Installer $VERSION" \
         "${YELLOW}Hello and thanks for using the Yiimpool Installer!${NC}
@@ -87,7 +88,7 @@ if [[ "$FIRST_TIME_SETUP" == "1" ]]; then
         source existing_user.sh
         exit
     else
-        echo -e "${YELLOW}Running as root. Proceeding to create user...${NC}\n"
+        print_status "Running as root: creating unprivileged install user next"
         source create_user.sh
         exit
     fi
@@ -95,11 +96,12 @@ if [[ "$FIRST_TIME_SETUP" == "1" ]]; then
 
 else
     clear
-    echo -e "${YELLOW}Loading configuration for subsequent runs...${NC}\n"
+    print_header "YiimPool installer (returning session)"
+    print_status "Reloading configuration from /etc/yiimpool.conf"
 
     # Ensure Python reads/writes files in UTF-8.
     if ! locale -a | grep en_US.utf8 >/dev/null; then
-        echo -e "${YELLOW}Generating en_US.UTF-8 locale...${NC}\n"
+        print_status "Generating en_US.UTF-8 locale"
         hide_output locale-gen en_US.UTF-8
     fi
 
@@ -107,20 +109,20 @@ else
     export LC_ALL=en_US.UTF-8
     export LANG=en_US.UTF-8
     export LC_TYPE=en_US.UTF-8
-    echo -e "${GREEN}Set system locale to en_US.UTF-8.${NC}\n"
+    print_success "Locale set to en_US.UTF-8"
 
     export NCURSES_NO_UTF8_ACS=1
-    echo -e "${GREEN}Configured NCURSES for correct line drawing characters.${NC}\n"
+    print_info "NCURSES_NO_UTF8_ACS=1 (better line drawing in PuTTY)"
 
-    echo -e "${YELLOW}Loading system functions and configuration...${NC}\n"
+    print_status "Refreshing /etc/functions.sh from the repository copy"
     # Always refresh /etc/functions.sh so it stays in sync with the repo
     sudo cp -f "$HOME/Yiimpoolv1/install/functions.sh" /etc/functions.sh
     source /etc/functions.sh
     source /etc/yiimpool.conf
-    echo -e "${GREEN}Loaded system functions and configuration.${NC}\n"
+    print_success "Functions and yiimpool.conf loaded"
 
-    # Start yiimpool
-    echo -e "${YELLOW}Starting Yiimpool installation...${NC}\n"
+    print_header "Main menu"
+    print_info "Choose Install or Manage & Upgrade options"
     cd "$HOME/Yiimpoolv1/install"
     source menu.sh
     cd ~

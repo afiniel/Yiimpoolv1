@@ -58,9 +58,14 @@ print_info "Pre-seeding MariaDB root password for version ${MARIADB_VERSION}"
 sudo debconf-set-selections <<< "mariadb-server-$MARIADB_VERSION mysql-server/root_password password $DBRootPassword"
 sudo debconf-set-selections <<< "mariadb-server-$MARIADB_VERSION mysql-server/root_password_again password $DBRootPassword"
 
+# Same as system.sh: avoid dpkg lock waits (unattended-upgrades) and non-interactive MariaDB postinst
+# (sudo often drops DEBIAN_FRONTEND unless passed explicitly).
+prepare_apt_for_install
 print_status "Installing MariaDB packages..."
 print_info "Installing mariadb-server mariadb-client"
-hide_output sudo apt install -y mariadb-server mariadb-client
+hide_output sudo env DEBIAN_FRONTEND=noninteractive NEEDRESTART_MODE=a apt-get install -y \
+	-o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew" \
+	mariadb-server mariadb-client
 print_success "MariaDB installation completed"
 
 print_header "Database Configuration"

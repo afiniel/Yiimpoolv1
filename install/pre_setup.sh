@@ -8,7 +8,8 @@
 
 source /etc/functions.sh
 clear
-echo -e "$YELLOW => Setting our global variables <= ${NC}"
+print_header "Network and storage defaults"
+print_status "Detecting public IP, IPv6, distro, and storage paths"
 
 # If the machine is behind a NAT, inside a VM, etc., it may not know
 # its IP address on the public network / the Internet. Ask the Internet

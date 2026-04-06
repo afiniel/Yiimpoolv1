@@ -91,6 +91,7 @@ case "$DISTRO" in
 esac
 print_success "MariaDB repository configured."
 hide_output sudo apt-get update
+prepare_apt_for_install
 
 if [ ! -f /boot/grub/menu.lst ]; then
     apt_get_quiet upgrade
@@ -103,11 +104,13 @@ fi
 apt_get_quiet dist-upgrade
 apt_get_quiet autoremove
 
+prepare_apt_for_install
+
 print_status "Installing base system packages..."
 hide_output sudo apt install -y python3 python3-dev python3-pip \
     wget curl git sudo coreutils bc \
     haveged pollinate unzip \
-    unattended-upgrades cron ntp fail2ban screen rsyslog lolcat nginx
+    unattended-upgrades cron ntpdate fail2ban screen rsyslog lolcat nginx
 print_success "Base system packages installed."
 
 print_status "Initializing system random number generator..."

@@ -9,7 +9,8 @@
 # Source functions and definitions
 source /etc/functions.sh
 
-echo -e "${YELLOW}Running pre-flight checks...${NC}\n"
+print_header "Pre-flight checks"
+print_info "Verifying OS version, memory, swap, and CPU architecture"
 
 # Identify OS
 if [[ -f /etc/lsb-release ]]; then
@@ -24,7 +25,7 @@ if [[ -f /etc/lsb-release ]]; then
     elif [[ "${UBUNTU_DESCRIPTION}" == "22.04" ]]; then
         DISTRO=22
     else
-        echo "This script only supports Ubuntu 22.04, 23.04, 24.04, or 25.04. Debian 11/12/13 is also supported."
+        print_error "Unsupported Ubuntu release (need 22.04, 23.04, 24.04, or 25.04). Debian 11/12/13 is supported."
         exit 1
     fi
 else
@@ -37,7 +38,7 @@ else
     elif [[ "${DEBIAN_DESCRIPTION}" == "11" ]]; then
         DISTRO=11
     else
-        echo "This script only supports Ubuntu 22.04, 23.04, 24.04, or 25.04. Debian 11/12/13 is also supported."
+        print_error "Unsupported Debian release (need 11, 12, or 13). Ubuntu 22.04–25.04 is supported."
         exit 1
     fi
 fi
@@ -53,8 +54,8 @@ TOTAL_PHYSICAL_MEM=$(head -n 1 /proc/meminfo | awk '{print $2}')
 AVAILABLE_DISK_SPACE=$(df / --output=avail | tail -n 1)
 
 if [ -z "$SWAP_MOUNTED" ] && [ -z "$SWAP_IN_FSTAB" ] && [ ! -e /swapfile ] && [ -z "$ROOT_IS_BTRFS" ] && [ $TOTAL_PHYSICAL_MEM -lt 1536000 ] && [ $AVAILABLE_DISK_SPACE -gt 5242880 ]; then
-    echo -e "${YELLOW}Adding a swap file to the system...${NC}"
-    
+    print_warning "Low RAM detected; creating a 3G swap file"
+
     # Allocate and activate the swap file
     sudo fallocate -l 3G /swapfile
     if [ -e /swapfile ]; then
@@ -63,9 +64,9 @@ if [ -z "$SWAP_MOUNTED" ] && [ -z "$SWAP_IN_FSTAB" ] && [ ! -e /swapfile ] && [ 
         sudo swapon /swapfile
         echo "vm.swappiness=10" | sudo tee -a /etc/sysctl.conf
         echo "/swapfile  none swap sw 0  0" | sudo tee -a /etc/fstab
-        echo -e "${GREEN}Swap file added and activated.${NC}\n"
+        print_success "Swap file created and enabled"
     else
-        echo -e "${RED}ERROR: Swap allocation failed.${NC}\n"
+        print_error "Swap allocation failed (fallocate /swapfile)"
     fi
 fi
 
@@ -73,8 +74,7 @@ fi
 ARCHITECTURE=$(uname -m)
 if [ "$ARCHITECTURE" != "x86_64" ]; then
     if [ -z "$ARM" ]; then
-        echo -e "${RED}Yiimpool Installer only supports x86_64 architecture and will not work on any other architecture, like ARM or 32-bit OS.${NC}"
-        echo -e "${RED}Your architecture is $ARCHITECTURE.${NC}\n"
+        print_error "YiimPool installer requires x86_64 (detected: $ARCHITECTURE)"
         exit 1
     fi
 fi
@@ -87,4 +87,4 @@ if [ -z "$STORAGE_ROOT" ]; then
     STORAGE_ROOT=${DEFAULT_STORAGE_ROOT:-"/home/$STORAGE_USER"}
 fi
 
-echo -e "${GREEN}Pre-flight checks completed successfully.${NC}\n"
+print_success "Pre-flight checks passed"
