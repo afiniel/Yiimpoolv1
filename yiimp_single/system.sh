@@ -43,7 +43,7 @@ print_success "Common packages installed"
 
 # CertBot
 print_header "Installing CertBot"
-if [[ "$DISTRO" == "22" || "$DISTRO" == "23" || "$DISTRO" == "24" || "$DISTRO" == "25" ]]; then
+if [[ "$DISTRO" == "22" || "$DISTRO" == "23" || "$DISTRO" == "24" || "$DISTRO" == "25" || "$DISTRO" == "26" ]]; then
     print_status "Installing CertBot via Snap for Ubuntu $DISTRO"
     hide_output sudo apt install -y snapd
     hide_output sudo snap install core
@@ -96,6 +96,9 @@ case "$DISTRO" in
     "25")  # Ubuntu 25.04
         REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.8/ubuntu plucky main"
         ;;
+    "26")  # Ubuntu 26.04
+        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.8/ubuntu resolute main"
+        ;;
     *)
         print_error "Unsupported Ubuntu/Debian version: $DISTRO"
         exit 1
@@ -110,7 +113,9 @@ print_success "MariaDB repository setup complete"
 export DEBIAN_FRONTEND=noninteractive
 export NEEDRESTART_MODE=a
 
-prepare_apt_for_install
+#prepare_apt_for_install
+
+# Installer hang some time from here TODO: Fix this.
 
 print_header "Updating System"
 
@@ -121,7 +126,7 @@ hide_output sudo -E apt-get autoremove -y
 
 print_success "System updated"
 
-prepare_apt_for_install
+# prepare_apt_for_install
 
 print_header "Installing Base System Packages"
 
@@ -186,6 +191,20 @@ if [[ "$DISTRO" == "11" || "$DISTRO" == "12" || "$DISTRO" == "13" ]]; then
         print_success "PHP repository added"
     fi
     print_success "PHP repository added"
+elif [[ "$DISTRO" == "22" || "$DISTRO" == "23" || "$DISTRO" == "24" || "$DISTRO" == "25" || "$DISTRO" == "26" ]]; then
+    # Ubuntu 26.04: ppa:ondrej/php does not publish packages; use packages.sury.org
+    if [ ! -f /etc/apt/sources.list.d/php.list ]; then
+        print_status "Adding PHP repository for Ubuntu 26.04 (packages.sury.org)"
+        hide_output sudo apt install -y apt-transport-https lsb-release ca-certificates curl
+        curl -fsSLo /tmp/debsuryorg-archive-keyring.deb https://packages.sury.org/debsuryorg-archive-keyring.deb
+        hide_output sudo dpkg -i /tmp/debsuryorg-archive-keyring.deb
+        echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" | \
+            sudo tee /etc/apt/sources.list.d/php.list
+        hide_output sudo apt-get update
+        print_success "PHP repository added"
+    else
+        print_status "PHP repository already exists for Ubuntu $DISTRO"
+    fi
 else
     # Check file content rather than filename — handles both .list (older Ubuntu)
     # and .sources (DEB822 format, Ubuntu 22.04+) without a fragile glob.
@@ -206,17 +225,26 @@ hide_output sudo apt-get update
 # PPA entry. Force a clean re-add if the package is still not visible.
 if ! apt-cache show php8.1 &>/dev/null; then
     print_status "php8.1 not found in cache — re-adding PHP repository"
-    sudo add-apt-repository -y --remove ppa:ondrej/php 2>/dev/null || true
-    hide_output sudo add-apt-repository -y ppa:ondrej/php
+    if [[ "$DISTRO" == "22" || "$DISTRO" == "23" || "$DISTRO" == "24" || "$DISTRO" == "25" || "$DISTRO" == "26" ]]; then
+        sudo rm -f /etc/apt/sources.list.d/php.list
+        hide_output sudo apt install -y apt-transport-https lsb-release ca-certificates curl
+        curl -fsSLo /tmp/debsuryorg-archive-keyring.deb https://packages.sury.org/debsuryorg-archive-keyring.deb
+        hide_output sudo dpkg -i /tmp/debsuryorg-archive-keyring.deb
+        echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" | \
+            sudo tee /etc/apt/sources.list.d/php.list
+    else
+        sudo add-apt-repository -y --remove ppa:ondrej/php 2>/dev/null || true
+        hide_output sudo add-apt-repository -y ppa:ondrej/php
+    fi
     hide_output sudo apt-get update
     if ! apt-cache show php8.1 &>/dev/null; then
-        print_error "PHP 8.1 is still not available after re-adding the PPA. Cannot continue."
+        print_error "PHP 8.1 is still not available after re-adding the repository. Cannot continue."
         exit 1
     fi
-    print_success "PHP repository added"
+    print_success "PHP 8.1 repository added"
 fi
 
-print_status "Installing PHP packages..."
+print_status "Installing PHP 8.1 packages..."
 
 print_header "Installing PHP 8.1 packages"
 hide_output sudo apt install -y php8.1-fpm php8.1-opcache php8.1 php8.1-common php8.1-gd

@@ -35,7 +35,7 @@ apt_dist_upgrade
 
 hide_output sudo apt install -y software-properties-common
 
-if [[ ("${DISTRO}" == "22" || "${DISTRO}" == "23" || "${DISTRO}" == "24" || "${DISTRO}" == "25") ]]; then
+if [[ ("${DISTRO}" == "22" || "${DISTRO}" == "23" || "${DISTRO}" == "24" || "${DISTRO}" == "25" || "${DISTRO}" == "26") ]]; then
     hide_output sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
 fi
 hide_output sudo apt-get update

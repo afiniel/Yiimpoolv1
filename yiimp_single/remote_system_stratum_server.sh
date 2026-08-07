@@ -42,13 +42,15 @@ hide_output sudo apt-get install -y software-properties-common build-essential
 
 # CertBot
 
-if [[ "$DISTRO" == "22" || "$DISTRO" == "23" || "$DISTRO" == "24" || "$DISTRO" == "25" ]]; then
+if [[ "$DISTRO" == "22" || "$DISTRO" == "23" || "$DISTRO" == "24" || "$DISTRO" == "25" || "$DISTRO" == "26" ]]; then
     print_status "Installing CertBot (snap)..."
     hide_output sudo apt install -y snapd
     hide_output sudo snap install core
     hide_output sudo snap refresh core
     hide_output sudo snap install --classic certbot
-    sudo ln -s /snap/bin/certbot /usr/bin/certbot
+    if [ ! -e /usr/bin/certbot ]; then
+        sudo ln -s /snap/bin/certbot /usr/bin/certbot
+    fi
     print_success "CertBot installed."
 
 elif [[ "$DISTRO" == "12" || "$DISTRO" == "11" || "$DISTRO" == "13" ]]; then
@@ -66,29 +68,49 @@ fi
 #fi
 
 print_status "Installing MariaDB..."
-hide_output sudo apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
 
+if [ ! -d /etc/apt/keyrings ]; then
+    sudo mkdir -p /etc/apt/keyrings
+fi
+
+if [ ! -f /etc/apt/keyrings/mariadb.gpg ]; then
+    print_status "Downloading MariaDB signing key..."
+    sudo curl -fsSL https://mariadb.org/mariadb_release_signing_key.pgp | sudo gpg --dearmor -o /etc/apt/keyrings/mariadb.gpg
+fi
+
+REPO_LINE=""
 case "$DISTRO" in
     "22")   # Ubuntu 22.04
-        sudo add-apt-repository -y 'deb [arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/10.6/ubuntu jammy main' >/dev/null 2>&1
+        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.8/ubuntu jammy main"
         ;;
     "23")   # Ubuntu 23.04
-        sudo add-apt-repository -y 'deb [arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.6/ubuntu lunar main' >/dev/null 2>&1
+        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.8/ubuntu mantic main"
         ;;
     "24")   # Ubuntu 24.04
-        sudo add-apt-repository -y 'deb [arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.6/ubuntu noble main' >/dev/null 2>&1
+        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.8/ubuntu noble main"
+        ;;
+    "25")   # Ubuntu 25.04
+        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.8/ubuntu plucky main"
+        ;;
+    "26")   # Ubuntu 26.04
+        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.8/ubuntu resolute main"
+        ;;
+    "13")   # Debian 13
+        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,i386,ppc64el] https://mirror.mariadb.org/repo/11.8/debian trixie main"
         ;;
     "12")   # Debian 12
-        sudo add-apt-repository -y 'deb [arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/11.6/debian bookworm main' >/dev/null 2>&1
+        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,i386,ppc64el] https://mirror.mariadb.org/repo/11.8/debian bookworm main"
         ;;
     "11")   # Debian 11
-        sudo add-apt-repository -y 'deb [arch=amd64,arm64,ppc64el,s390x] https://mirror.mariadb.org/repo/10.6/debian bullseye main' >/dev/null 2>&1
+        REPO_LINE="deb [signed-by=/etc/apt/keyrings/mariadb.gpg arch=amd64,arm64,i386,ppc64el] https://mirror.mariadb.org/repo/11.8/debian bullseye main"
         ;;
     *)
         echo "Unsupported distro version: $DISTRO"
         exit 1
         ;;
 esac
+
+echo "$REPO_LINE" | sudo tee /etc/apt/sources.list.d/mariadb.list >/dev/null
 print_success "MariaDB repository configured."
 hide_output sudo apt-get update
 prepare_apt_for_install
@@ -166,22 +188,30 @@ if [[ "$DISTRO" == "12" ]]; then
     hide_output sudo apt install -y python3-launchpadlib
 fi
 
-if [[ "$DISTRO" == "22" || "$DISTRO" == "23" || "$DISTRO" == "24" || "$DISTRO" == "25" ]]; then
+if [[ "$DISTRO" == "26" ]]; then
+    if [ ! -f /etc/apt/sources.list.d/php.list ]; then
+        hide_output sudo apt install -y apt-transport-https lsb-release ca-certificates curl
+        curl -fsSLo /tmp/debsuryorg-archive-keyring.deb https://packages.sury.org/debsuryorg-archive-keyring.deb
+        hide_output sudo dpkg -i /tmp/debsuryorg-archive-keyring.deb
+        echo "deb [signed-by=/usr/share/keyrings/debsuryorg-archive-keyring.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list
+        hide_output sudo apt-get update
+    fi
+elif [[ "$DISTRO" == "22" || "$DISTRO" == "23" || "$DISTRO" == "24" || "$DISTRO" == "25" ]]; then
     if ! grep -rq "ondrej/php" /etc/apt/sources.list.d/ 2>/dev/null; then
         hide_output sudo add-apt-repository -y ppa:ondrej/php
     fi
 elif [[ "$DISTRO" == "13" || "$DISTRO" == "12" || "$DISTRO" == "11" ]]; then
-    if [ ! -f /etc/apt/sources.list.d/ondrej-php.list ]; then
+    if [ ! -f /etc/apt/sources.list.d/php.list ]; then
         hide_output sudo apt-get install -y apt-transport-https lsb-release ca-certificates
-        wget -qO - https://packages.sury.org/php/apt.gpg | sudo apt-key add -
-        echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list
+        curl -fsSL https://packages.sury.org/php/apt.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/php.gpg
+        echo "deb [signed-by=/etc/apt/keyrings/php.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list
         hide_output sudo apt-get update
     fi
 fi
 
 hide_output sudo apt-get update
 
-if [[ "$DISTRO" == "22" || "$DISTRO" == "23" || "$DISTRO" == "24" || "$DISTRO" == "25" ]]; then
+if [[ "$DISTRO" == "22" || "$DISTRO" == "23" || "$DISTRO" == "24" || "$DISTRO" == "25" || "$DISTRO" == "26" ]]; then
 
     hide_output sudo apt install -y php8.1-fpm php8.1-opcache php8.1 php8.1-common php8.1-gd
     hide_output sudo apt install -y php8.1-mysql php8.1-imap php8.1-cli php8.1-cgi
@@ -219,7 +249,7 @@ elif [[ "$DISTRO" == "12" || "$DISTRO" == "11" ]]; then
 
 fi
 
-if [[ ("$DISTRO" == "20" ) || "$DISTRO" == "22" || "$DISTRO" == "23" || "$DISTRO" == "24" ]]; then
+if [[ ("$DISTRO" == "20" ) || "$DISTRO" == "22" || "$DISTRO" == "23" || "$DISTRO" == "24" || "$DISTRO" == "25" || "$DISTRO" == "26" ]]; then
 
 	hide_output sudo apt install -y php8.1-fpm php8.1-opcache php8.1 php8.1-common php8.1-gd php8.1-mysql php8.1-imap php8.1-cli
 	hide_output sudo apt install -y php8.1-cgi php8.1-curl php8.1-intl php8.1-pspell

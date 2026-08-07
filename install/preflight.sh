@@ -16,7 +16,9 @@ print_info "Verifying OS version, memory, swap, and CPU architecture"
 if [[ -f /etc/lsb-release ]]; then
 
     UBUNTU_DESCRIPTION=$(lsb_release -rs)
-    if [[ "${UBUNTU_DESCRIPTION}" == "25.04" ]]; then
+    if [[ "${UBUNTU_DESCRIPTION}" == "26.04" ]]; then
+        DISTRO=26
+    elif [[ "${UBUNTU_DESCRIPTION}" == "25.04" ]]; then
         DISTRO=25
     elif [[ "${UBUNTU_DESCRIPTION}" == "24.04" ]]; then
         DISTRO=24
@@ -25,7 +27,7 @@ if [[ -f /etc/lsb-release ]]; then
     elif [[ "${UBUNTU_DESCRIPTION}" == "22.04" ]]; then
         DISTRO=22
     else
-        print_error "Unsupported Ubuntu release (need 22.04, 23.04, 24.04, or 25.04). Debian 11/12/13 is supported."
+        print_error "Unsupported Ubuntu release (need 22.04, 23.04, 24.04, 25.04, or 26.04). Debian 11/12/13 is supported."
         exit 1
     fi
 else
@@ -38,7 +40,7 @@ else
     elif [[ "${DEBIAN_DESCRIPTION}" == "11" ]]; then
         DISTRO=11
     else
-        print_error "Unsupported Debian release (need 11, 12, or 13). Ubuntu 22.04–25.04 is supported."
+        print_error "Unsupported Debian release (need 11, 12, or 13)."
         exit 1
     fi
 fi

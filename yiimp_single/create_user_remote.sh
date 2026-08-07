@@ -61,7 +61,9 @@ fi
 if [[ -f /etc/lsb-release ]]; then
 
     UBUNTU_DESCRIPTION=$(lsb_release -rs)
-    if [[ "${UBUNTU_DESCRIPTION}" == "25.04" ]]; then
+    if [[ "${UBUNTU_DESCRIPTION}" == "26.04" ]]; then
+        DISTRO=26
+    elif [[ "${UBUNTU_DESCRIPTION}" == "25.04" ]]; then
         DISTRO=25
     elif [[ "${UBUNTU_DESCRIPTION}" == "24.04" ]]; then
         DISTRO=24
@@ -70,7 +72,7 @@ if [[ -f /etc/lsb-release ]]; then
     elif [[ "${UBUNTU_DESCRIPTION}" == "22.04" ]]; then
         DISTRO=22
     else
-        echo "This script only supports Ubuntu 22.04, 23.04, 24.04, or 25.04. Debian 11/12/13 is also supported."
+        echo "This script only supports Ubuntu 22.04, 23.04, 24.04, 25.04, or 26.04. Debian 11/12/13 is also supported."
         exit 1
     fi
 else
@@ -82,7 +84,7 @@ else
     elif [[ "${DEBIAN_DESCRIPTION}" == "11" ]]; then
         DISTRO=11
     else
-        echo "This script only supports Ubuntu 22.04, 23.04, 24.04, or 25.04. Debian 11/12/13 is also supported."
+        echo "This script only supports Ubuntu 22.04, 23.04, 24.04, 25.04, or 26.04. Debian 11/12/13 is also supported."
         exit 1
     fi
 fi

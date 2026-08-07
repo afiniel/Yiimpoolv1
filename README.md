@@ -48,6 +48,7 @@ A clean domain or subdomain pointed to your server's IP address is required befo
 ### Ubuntu
 | Version | Status |
 |---------|--------|
+| Ubuntu 26.04 | ✅ Supported (Not full tested)|
 | Ubuntu 25.04 | ✅ Supported |
 | Ubuntu 24.04 LTS | ✅ Supported |
 | Ubuntu 23.04 | ✅ Supported |

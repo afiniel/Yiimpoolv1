@@ -108,6 +108,7 @@ if [ -z "${DISTRO:-}" ]; then
     if [ -f /etc/lsb-release ]; then
         _ver=$(lsb_release -rs)
         case "$_ver" in
+            26.04) DISTRO=26 ;;
             25.04) DISTRO=25 ;;
             24.04) DISTRO=24 ;;
             23.04) DISTRO=23 ;;
